@@ -2,428 +2,503 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin - Zivoon Books</title>
-  <link rel="stylesheet" href="./style.css" />
+
   <style>
-    /* Small admin UI (you can move to style.css later) */
-    .wrap{max-width:1100px;margin:24px auto;padding:0 16px;}
-    .card{background:#fff;border:1px solid #e7e7e7;border-radius:14px;padding:16px;margin:12px 0;box-shadow:0 2px 10px rgba(0,0,0,.03)}
-    .row{display:flex;gap:12px;flex-wrap:wrap}
-    .row > div{flex:1;min-width:220px}
-    label{display:block;font-size:13px;margin:10px 0 6px;color:#333}
-    input, textarea, select{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:10px;font-size:14px}
-    textarea{min-height:90px;resize:vertical}
-    button{padding:10px 14px;border:0;border-radius:10px;cursor:pointer;font-weight:600}
-    .btn{background:#16a34a;color:#fff}
-    .btn2{background:#0ea5e9;color:#fff}
-    .btnDanger{background:#ef4444;color:#fff}
-    .btnGhost{background:#f3f4f6}
-    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .muted{color:#666;font-size:13px}
-    .hidden{display:none !important}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;vertical-align:top}
-    th{font-size:13px;color:#444}
-    .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#f3f4f6;font-size:12px;color:#333}
-    .actions{display:flex;gap:8px;flex-wrap:wrap}
-    .status{font-size:13px;color:#111}
-    .ok{color:#16a34a}
-    .err{color:#ef4444}
+    :root{
+      --bg1:#0b2a4a; --bg2:#0a1e36;
+      --card:#ffffff; --muted:#6b7280;
+      --border:#e5e7eb; --ok:#16a34a; --err:#ef4444;
+      --btn:#2563eb; --btn2:#0ea5e9; --danger:#dc2626;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:linear-gradient(140deg,var(--bg1),var(--bg2));
+      color:#111;
+      min-height:100vh;
+    }
+    header{
+      padding:22px 18px;
+      color:#fff;
+      font-weight:700;
+      letter-spacing:.3px;
+      font-size:24px;
+    }
+    .wrap{max-width:1100px; margin:0 auto; padding:0 18px 40px;}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:0 16px 40px rgba(0,0,0,.18);
+      padding:18px;
+    }
+    .row{display:flex; gap:14px; flex-wrap:wrap;}
+    .row > *{flex:1; min-width:220px;}
+    label{display:block; font-size:13px; color:#374151; margin:10px 0 6px;}
+    input, textarea, select{
+      width:100%;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:10px;
+      outline:none;
+      font-size:14px;
+      background:#fff;
+    }
+    textarea{min-height:88px; resize:vertical;}
+    .actions{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+    button{
+      border:0;
+      cursor:pointer;
+      padding:10px 14px;
+      border-radius:10px;
+      font-weight:600;
+      font-size:14px;
+    }
+    .btn{background:var(--btn); color:#fff;}
+    .btn2{background:var(--btn2); color:#fff;}
+    .danger{background:var(--danger); color:#fff;}
+    .ghost{background:#f3f4f6; color:#111; border:1px solid var(--border);}
+    .pill{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#f3f4f6;
+      border:1px solid var(--border);
+      font-size:13px;
+      color:#111;
+    }
+    .muted{color:var(--muted); font-size:13px;}
+    .status{font-size:13px; margin-top:8px;}
+    .ok{color:var(--ok);} .err{color:var(--err);}
+
+    table{width:100%; border-collapse:collapse; margin-top:14px;}
+    th, td{
+      border-bottom:1px solid var(--border);
+      padding:10px 8px;
+      text-align:left;
+      vertical-align:top;
+      font-size:14px;
+    }
+    th{font-size:12px; text-transform:uppercase; color:#374151; letter-spacing:.06em;}
+    .small{font-size:12px; color:#6b7280;}
+    .topbar{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;}
+    .hidden{display:none !important;}
+    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+    @media(max-width:900px){ .grid2{grid-template-columns:1fr;} }
+    .divider{height:1px; background:var(--border); margin:14px 0;}
   </style>
 
   <!-- Supabase JS (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
-  <div class="wrap">
-    <div class="topbar">
-      <div>
-        <h2 style="margin:0">Admin Panel</h2>
-        <div class="muted">Manage books in Supabase (CRUD)</div>
-      </div>
-      <div class="actions">
-        <span id="who" class="pill hidden"></span>
-        <button id="btnLogout" class="btnGhost hidden">Logout</button>
-      </div>
-    </div>
-
-    <!-- LOGIN CARD -->
-    <div id="loginCard" class="card">
-      <h3 style="margin-top:0">Login</h3>
-      <div class="row">
-        <div>
-          <label>Email</label>
-          <input id="loginEmail" type="email" placeholder="you@example.com" />
-        </div>
-        <div>
-          <label>Password</label>
-          <input id="loginPassword" type="password" placeholder="••••••••" />
-        </div>
-      </div>
-      <div class="actions" style="margin-top:12px">
-        <button id="btnLogin" class="btn2">Sign in</button>
-      </div>
-      <div id="loginMsg" class="status" style="margin-top:10px"></div>
-    </div>
-
-    <!-- ADMIN CARD -->
-    <div id="adminCard" class="card hidden">
-      <div class="topbar">
-        <h3 style="margin:0">Books</h3>
-        <div class="actions">
-          <button id="btnRefresh" class="btnGhost">Refresh</button>
-        </div>
-      </div>
-
-      <!-- FORM -->
-      <div class="card" style="background:#fafafa">
-        <h4 style="margin:0 0 8px 0">Add / Edit book</h4>
-        <div class="muted">إذا بغيتي تزيدي جديد خلي id خاوِي، وإذا بغيتي تعدّلي اختاري Book من اللائحة وغادي يتعمر الفورم.</div>
-
-        <div class="row" style="margin-top:10px">
-          <div>
-            <label>ID (auto)</label>
-            <input id="bookId" type="text" placeholder="(auto)" disabled />
-          </div>
-          <div>
-            <label>Title</label>
-            <input id="title" type="text" placeholder="Book title" />
-          </div>
-          <div>
-            <label>Author</label>
-            <input id="author" type="text" placeholder="Author name" />
-          </div>
-        </div>
-
-        <label>Description</label>
-        <textarea id="description" placeholder="Short description..."></textarea>
-
-        <div class="row">
-          <div>
-            <label>Price (USD)</label>
-            <input id="price" type="number" step="0.01" placeholder="9.99" />
-          </div>
-          <div>
-            <label>Rating (0-5)</label>
-            <input id="rating" type="number" step="0.1" min="0" max="5" placeholder="4.8" />
-          </div>
-          <div>
-            <label>Language</label>
-            <input id="language" type="text" placeholder="en,ar" />
-          </div>
-        </div>
-
-        <div class="actions" style="margin-top:12px">
-          <button id="btnSave" class="btn">Save (Insert/Update)</button>
-          <button id="btnClear" class="btnGhost">Clear</button>
-          <button id="btnDelete" class="btnDanger hidden">Delete</button>
-        </div>
-
-        <div id="formMsg" class="status" style="margin-top:10px"></div>
-      </div>
-
-      <!-- TABLE -->
-      <div class="card">
-        <div class="topbar">
-          <h4 style="margin:0">List</h4>
-          <div class="muted" id="count"></div>
-        </div>
-        <div style="overflow:auto">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Title / Author</th>
-                <th>Price</th>
-                <th>Rating</th>
-                <th>Language</th>
-                <th>Created</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="tbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-  </div>
 
   <script>
-    // 1) PASTE YOUR SUPABASE KEYS HERE:
+    // ✅ 1) بدّلي هاد جوج:
     const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE";
-    const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
+    const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_PUBLIC_KEY_HERE";
 
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // create client
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // UI refs
-    const loginCard = document.getElementById("loginCard");
-    const adminCard = document.getElementById("adminCard");
-    const who = document.getElementById("who");
-    const btnLogout = document.getElementById("btnLogout");
+    // Table name
+    const TABLE = "books";
 
-    const loginEmail = document.getElementById("loginEmail");
-    const loginPassword = document.getElementById("loginPassword");
-    const btnLogin = document.getElementById("btnLogin");
-    const loginMsg = document.getElementById("loginMsg");
-
-    const bookId = document.getElementById("bookId");
-    const title = document.getElementById("title");
-    const author = document.getElementById("author");
-    const description = document.getElementById("description");
-    const price = document.getElementById("price");
-    const rating = document.getElementById("rating");
-    const language = document.getElementById("language");
-
-    const btnSave = document.getElementById("btnSave");
-    const btnClear = document.getElementById("btnClear");
-    const btnDelete = document.getElementById("btnDelete");
-    const formMsg = document.getElementById("formMsg");
-
-    const btnRefresh = document.getElementById("btnRefresh");
-    const tbody = document.getElementById("tbody");
-    const count = document.getElementById("count");
-
-    let selectedRow = null;
-
-    function setMsg(el, text, ok=true){
-      el.textContent = text || "";
-      el.className = "status " + (text ? (ok ? "ok" : "err") : "");
-    }
-
-    function showAdmin(email){
-      loginCard.classList.add("hidden");
-      adminCard.classList.remove("hidden");
-      who.classList.remove("hidden");
-      btnLogout.classList.remove("hidden");
-      who.textContent = email || "authenticated";
-    }
-
-    function showLogin(){
-      adminCard.classList.add("hidden");
-      loginCard.classList.remove("hidden");
-      who.classList.add("hidden");
-      btnLogout.classList.add("hidden");
-      clearForm();
-    }
-
-    function clearForm(){
-      selectedRow = null;
-      bookId.value = "";
-      title.value = "";
-      author.value = "";
-      description.value = "";
-      price.value = "";
-      rating.value = "";
-      language.value = "";
-      btnDelete.classList.add("hidden");
-      setMsg(formMsg, "");
-    }
-
-    async function loadBooks(){
-      setMsg(formMsg, "");
-      tbody.innerHTML = "<tr><td colspan='7' class='muted'>Loading...</td></tr>";
-
-      const { data, error } = await sb
-        .from("books")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if(error){
-        tbody.innerHTML = "";
-        count.textContent = "";
-        setMsg(formMsg, "Error loading books: " + error.message, false);
-        return;
-      }
-
-      count.textContent = ${data.length} items;
-      tbody.innerHTML = "";
-
-      if(data.length === 0){
-        tbody.innerHTML = "<tr><td colspan='7' class='muted'>No books yet.</td></tr>";
-        return;
-      }
-
-      for(const row of data){
-        const tr = document.createElement("tr");
-
-        tr.innerHTML = `
-          <td>${row.id ?? ""}</td>
-          <td>
-            <div><strong>${escapeHtml(row.title ?? "")}</strong></div>
-            <div class="muted">${escapeHtml(row.author ?? "")}</div>
-          </td>
-          <td>${row.price ?? ""}</td>
-          <td>${row.rating ?? ""}</td>
-          <td>${escapeHtml(row.language ?? "")}</td>
-          <td class="muted">${row.created_at ? new Date(row.created_at).toLocaleString() : ""}</td>
-          <td>
-            <div class="actions">
-              <button class="btnGhost" data-edit="${row.id}">Edit</button>
-              <button class="btnDanger" data-del="${row.id}">Delete</button>
-            </div>
-          </td>
-        `;
-
-        tbody.appendChild(tr);
-      }
-
-      // Attach handlers for edit/delete buttons
-      tbody.querySelectorAll("[data-edit]").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const id = btn.getAttribute("data-edit");
-          await editBook(id);
-        });
-      });
-
-      tbody.querySelectorAll("[data-del]").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const id = btn.getAttribute("data-del");
-          await deleteBook(id);
-        });
-      });
-    }
-
-    async function editBook(id){
-      setMsg(formMsg, "");
-      const { data, error } = await sb
-        .from("books")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-      if(error){
-        setMsg(formMsg, "Error loading book: " + error.message, false);
-        return;
-      }
-
-      selectedRow = data;
-      bookId.value = data.id ?? "";
-      title.value = data.title ?? "";
-      author.value = data.author ?? "";
-      description.value = data.description ?? "";
-      price.value = data.price ?? "";
-      rating.value = data.rating ?? "";
-      language.value = data.language ?? "";
-
-      btnDelete.classList.remove("hidden");
-      setMsg(formMsg, "Loaded for edit ✅", true);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    async function saveBook(){
-      setMsg(formMsg, "");
-
-      // Basic validation
-      if(!title.value.trim()){
-        setMsg(formMsg, "Title is required.", false);
-        return;
-      }
-
-      const payload = {
-        title: title.value.trim(),
-        author: author.value.trim() || null,
-        description: description.value.trim() || null,
-        price: price.value !== "" ? Number(price.value) : null,
-        rating: rating.value !== "" ? Number(rating.value) : null,
-        language: language.value.trim() || null
-      };
-
-      if(bookId.value){
-        // UPDATE
-        const id = Number(bookId.value);
-        const { error } = await sb.from("books").update(payload).eq("id", id);
-        if(error){
-          setMsg(formMsg, "Update failed: " + error.message, false);
-          return;
-        }
-        setMsg(formMsg, "Updated ✅", true);
-      } else {
-        // INSERT
-        const { error } = await sb.from("books").insert(payload);
-        if(error){
-          setMsg(formMsg, "Insert failed: " + error.message, false);
-          return;
-        }
-        setMsg(formMsg, "Added ✅", true);
-      }
-
-      clearForm();
-      await loadBooks();
-    }
-
-    async function deleteBook(idFromList){
-      const id = idFromList ? Number(idFromList) : (bookId.value ? Number(bookId.value) : null);
-      if(!id) return;
-
-      const ok = confirm("Delete this book? (id: " + id + ")");
-      if(!ok) return;
-
-      const { error } = await sb.from("books").delete().eq("id", id);
-      if(error){
-        setMsg(formMsg, "Delete failed: " + error.message, false);
-        return;
-      }
-
-      setMsg(formMsg, "Deleted ✅", true);
-      clearForm();
-      await loadBooks();
-    }
-
-    function escapeHtml(str){
-      return String(str)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    // Auth
-    btnLogin.addEventListener("click", async ()=>{
-      setMsg(loginMsg, "");
-
-      const email = loginEmail.value.trim();
-      const pass = loginPassword.value;
-
-      if(!email || !pass){
-        setMsg(loginMsg, "دخل email و password.", false);
-        return;
-      }
-
-      const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-      if(error){
-        setMsg(loginMsg, "Login error: " + error.message, false);
-        return;
-      }
-
-      setMsg(loginMsg, "Logged in ✅", true);
-      showAdmin(data.user?.email);
-      await loadBooks();
-    });
-
-    btnLogout.addEventListener("click", async ()=>{
-      await sb.auth.signOut();
-      showLogin();
-    });
-
-    btnRefresh.addEventListener("click", loadBooks);
-    btnSave.addEventListener("click", saveBook);
-    btnClear.addEventListener("click", clearForm);
-    btnDelete.addEventListener("click", ()=>deleteBook());
-
-    // On page load: check session
-    (async ()=>{
-      const { data } = await sb.auth.getSession();
-      const session = data.session;
-      if(session?.user){
-        showAdmin(session.user.email);
-        await loadBooks();
-      } else {
-        showLogin();
-      }
-    })();
+    // OPTIONAL: زيدي إيميلك هنا باش نخليو الدخول غير ليه (حماية إضافية من الواجهة)
+    const ADMIN_EMAIL_ALLOWLIST = [
+      "artwood.asmae@gmail.com"
+    ];
   </script>
+</head>
+
+<body>
+  <header>Admin Panel</header>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="topbar">
+        <div>
+          <div style="font-weight:800; font-size:18px;">Zivoon Books — Dashboard</div>
+          <div class="muted">Login, add, edit, delete books from Supabase.</div>
+        </div>
+
+        <div class="actions">
+          <span id="who" class="pill hidden"></span>
+          <button id="btnLogout" class="ghost hidden">Logout</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- LOGIN -->
+      <div id="loginBox">
+        <div class="row">
+          <div>
+            <label>Email</label>
+            <input id="email" type="email" placeholder="you@email.com" autocomplete="email" />
+          </div>
+          <div>
+            <label>Password</label>
+            <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
+          </div>
+          <div style="display:flex; align-items:flex-end; gap:10px;">
+            <button id="btnLogin" class="btn">Sign in</button>
+            <button id="btnSignup" class="ghost" title="Create account (only once)">Sign up</button>
+          </div>
+        </div>
+        <div id="loginStatus" class="status muted"></div>
+
+        <div class="muted" style="margin-top:10px;">
+          Tip: إلا بغيتي غير إنتي تكوني Admin، دخّلي الإيميل ديالك فـ <b>ADMIN_EMAIL_ALLOWLIST</b> فالـ code.
+        </div>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div id="dash" class="hidden">
+        <div class="grid2">
+          <div>
+            <div style="font-weight:800; margin-bottom:6px;">Add / Update book</div>
+            <div class="muted">إلى بغيتي تعدلي كتاب، كليكي عليه من اللائحة لتحت.</div>
+
+            <input id="editId" type="hidden" />
+
+            <label>Title</label>
+            <input id="title" type="text" placeholder="Book title" />
+
+            <label>Author</label>
+            <input id="author" type="text" placeholder="Author name" />
+
+            <label>Description</label>
+            <textarea id="description" placeholder="Short description..."></textarea>
+
+            <div class="row">
+              <div>
+                <label>Price</label>
+                <input id="price" type="number" step="0.01" placeholder="9.99" />
+              </div>
+              <div>
+                <label>Rating</label>
+                <input id="rating" type="number" step="0.1" placeholder="5" />
+              </div>
+              <div>
+                <label>Language</label>
+                <input id="language" type="text" placeholder="en, ar, fr..." />
+              </div>
+            </div>
+
+            <div class="actions" style="margin-top:12px;">
+              <button id="btnSave" class="btn2">Save (Insert/Update)</button>
+              <button id="btnClear" class="ghost">Clear</button>
+              <button id="btnDelete" class="danger hidden">Delete selected</button>
+            </div>
+
+            <div id="formStatus" class="status muted"></div>
+          </div>
+
+          <div>
+            <div class="topbar">
+              <div>
+                <div style="font-weight:800; margin-bottom:6px;">Books list</div>
+                <div class="muted">Search, refresh, and manage your books.</div>
+              </div>
+              <div class="actions">
+                <input id="search" type="text" placeholder="Search title/author..." style="max-width:260px;" />
+                <button id="btnRefresh" class="ghost">Refresh</button>
+              </div>
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:70px;">ID</th>
+                  <th>Title</th>
+                  <th>Author</th>
+                  <th style="width:90px;">Price</th>
+                  <th style="width:80px;">Rating</th>
+                  <th style="width:90px;">Lang</th>
+                  <th style="width:160px;">Created</th>
+                </tr>
+              </thead>
+              <tbody id="tbody">
+                <tr><td colspan="7" class="muted">Loading...</td></tr>
+              </tbody>
+            </table>
+
+            <div id="listStatus" class="status muted"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+  // Helpers
+  const $ = (id) => document.getElementById(id);
+  const setText = (id, txt, cls="muted") => { const el=$(id); el.className = "status " + cls; el.textContent = txt || ""; };
+
+  function safeNumber(v){
+    if(v === "" || v === null || v === undefined) return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function formatDate(ts){
+    if(!ts) return "";
+    try{
+      const d = new Date(ts);
+      return d.toLocaleString();
+    }catch(e){ return String(ts); }
+  }
+
+  // UI state
+  function showLoggedOut(){
+    $("loginBox").classList.remove("hidden");
+    $("dash").classList.add("hidden");
+    $("who").classList.add("hidden");
+    $("btnLogout").classList.add("hidden");
+    setText("loginStatus", "", "muted");
+  }
+  function showLoggedIn(email){
+    $("loginBox").classList.add("hidden");
+    $("dash").classList.remove("hidden");
+    $("who").classList.remove("hidden");
+    $("btnLogout").classList.remove("hidden");
+    $("who").textContent = "Logged in: " + email;
+  }
+
+  function clearForm(){
+    $("editId").value = "";
+    $("title").value = "";
+    $("author").value = "";
+    $("description").value = "";
+    $("price").value = "";
+    $("rating").value = "";
+    $("language").value = "";
+    $("btnDelete").classList.add("hidden");
+    setText("formStatus", "", "muted");
+  }
+
+  function fillForm(row){
+    $("editId").value = row.id ?? "";
+    $("title").value = row.title ?? "";
+    $("author").value = row.author ?? "";
+    $("description").value = row.description ?? "";
+    $("price").value = row.price ?? "";
+    $("rating").value = row.rating ?? "";
+    $("language").value = row.language ?? "";
+    $("btnDelete").classList.remove("hidden");
+    setText("formStatus", "Selected ID: " + row.id, "ok");
+  }
+
+  async function refreshList(){
+    setText("listStatus", "Loading books...", "muted");
+    const q = ($("search").value || "").trim().toLowerCase();
+
+    const { data, error } = await sb
+      .from(TABLE)
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if(error){
+      $("tbody").innerHTML = <tr><td colspan="7" class="err">Error: ${error.message}</td></tr>;
+      setText("listStatus", "Failed to load.", "err");
+      return;
+    }
+
+    const filtered = (data || []).filter(r => {
+      if(!q) return true;
+      const t = String(r.title || "").toLowerCase();
+      const a = String(r.author || "").toLowerCase();
+      return t.includes(q) || a.includes(q);
+    });
+
+    if(filtered.length === 0){
+      $("tbody").innerHTML = <tr><td colspan="7" class="muted">No books found.</td></tr>;
+      setText("listStatus", "0 results.", "muted");
+      return;
+    }
+
+    $("tbody").innerHTML = filtered.map(r => `
+      <tr data-id="${r.id}">
+        <td><b>#${r.id}</b></td>
+        <td>
+          <div style="font-weight:700">${escapeHtml(r.title || "")}</div>
+          <div class="small">${escapeHtml((r.description || "").slice(0,70))}${(r.description||"").length>70?"…":""}</div>
+        </td>
+        <td>${escapeHtml(r.author || "")}</td>
+        <td>${r.price ?? ""}</td>
+        <td>${r.rating ?? ""}</td>
+        <td>${escapeHtml(r.language || "")}</td>
+        <td class="small">${escapeHtml(formatDate(r.created_at))}</td>
+      </tr>
+    `).join("");
+
+    // click to edit
+    [...$("tbody").querySelectorAll("tr")].forEach(tr => {
+      tr.addEventListener("click", () => {
+        const id = Number(tr.getAttribute("data-id"));
+        const row = filtered.find(x => x.id === id);
+        if(row) fillForm(row);
+      });
+    });
+
+    setText("listStatus", ${filtered.length} book(s) loaded., "ok");
+  }
+
+  // Basic HTML escape to avoid broken table
+  function escapeHtml(str){
+    return String(str)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  // Auth check + allowlist
+  async function bootstrap(){
+    try{
+      const { data } = await sb.auth.getSession();
+      const session = data?.session;
+
+      if(!session){
+        showLoggedOut();
+        return;
+      }
+
+      const email = session.user?.email || "";
+      // extra UI-only protection
+      if(ADMIN_EMAIL_ALLOWLIST.length && !ADMIN_EMAIL_ALLOWLIST.includes(email)){
+        await sb.auth.signOut();
+        showLoggedOut();
+        setText("loginStatus", "This email is not allowed for admin.", "err");
+        return;
+      }
+
+      showLoggedIn(email);
+      await refreshList();
+    }catch(e){
+      showLoggedOut();
+      setText("loginStatus", "Setup error: " + e.message, "err");
+    }
+  }
+
+  // Events
+  $("btnLogin").addEventListener("click", async () => {
+    setText("loginStatus", "Signing in...", "muted");
+    const email = $("email").value.trim();
+    const password = $("password").value;
+
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if(error){
+      setText("loginStatus", error.message, "err");
+      return;
+    }
+
+    const u = data?.user?.email || email;
+    if(ADMIN_EMAIL_ALLOWLIST.length && !ADMIN_EMAIL_ALLOWLIST.includes(u)){
+      await sb.auth.signOut();
+      setText("loginStatus", "This email is not allowed for admin.", "err");
+      return;
+    }
+
+    showLoggedIn(u);
+    clearForm();
+    await refreshList();
+  });
+
+  $("btnSignup").addEventListener("click", async () => {
+    setText("loginStatus", "Creating account...", "muted");
+    const email = $("email").value.trim();
+    const password = $("password").value;
+
+    const { data, error } = await sb.auth.signUp({ email, password });
+    if(error){
+      setText("loginStatus", error.message, "err");
+      return;
+    }
+
+    // depending on email confirmations, user may need confirm
+    setText("loginStatus", "Account created. If email confirmation is ON, check your inbox then login.", "ok");
+  });
+
+  $("btnLogout").addEventListener("click", async () => {
+    await sb.auth.signOut();
+    showLoggedOut();
+    clearForm();
+  });
+
+  $("btnClear").addEventListener("click", () => clearForm());
+  $("btnRefresh").addEventListener("click", () => refreshList());
+  $("search").addEventListener("input", () => refreshList());
+
+  $("btnSave").addEventListener("click", async () => {
+    setText("formStatus", "Saving...", "muted");
+
+    const id = $("editId").value ? Number($("editId").value) : null;
+
+    const payload = {
+      title: $("title").value.trim() || null,
+      author: $("author").value.trim() || null,
+      description: $("description").value.trim() || null,
+      price: safeNumber($("price").value),
+      rating: safeNumber($("rating").value),
+      language: $("language").value.trim() || null
+    };
+
+    // simple validation
+    if(!payload.title){
+      setText("formStatus", "Title is required.", "err");
+      return;
+    }
+
+    let res;
+    if(id){
+      res = await sb.from(TABLE).update(payload).eq("id", id).select().single();
+    } else {
+      res = await sb.from(TABLE).insert(payload).select().single();
+    }
+
+    if(res.error){
+      setText("formStatus", res.error.message, "err");
+      return;
+    }
+
+    setText("formStatus", id ? "Updated ✅" : "Inserted ✅", "ok");
+    clearForm();
+    await refreshList();
+  });
+
+  $("btnDelete").addEventListener("click", async () => {
+    const id = $("editId").value ? Number($("editId").value) : null;
+    if(!id) return;
+
+    if(!confirm("Delete this book? ID: " + id)){
+      return;
+    }
+
+    setText("formStatus", "Deleting...", "muted");
+    const { error } = await sb.from(TABLE).delete().eq("id", id);
+    if(error){
+      setText("formStatus", error.message, "err");
+      return;
+    }
+
+    setText("formStatus", "Deleted ✅", "ok");
+    clearForm();
+    await refreshList();
+  });
+
+  // React to auth changes (optional)
+  sb.auth.onAuthStateChange((_event, _session) => {
+    // just refresh UI quickly
+    bootstrap();
+  });
+
+  // start
+  bootstrap();
+</script>
 </body>
 </html>
