@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <!-- SUPABASE CDN (global name: supabase) -->
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
 <style>
 body{font-family:Arial,sans-serif;background:#f2f4f7}
@@ -41,10 +41,10 @@ button{background:#2563eb;color:#fff;border:none;cursor:pointer}
 <script>
 /* ===== CONFIG ===== */
 const SUPABASE_URL = "https://kmheqgtavgmljyzvbrsj.supabase.co";
-const SUPABASE_KEY = "sb_publishable_RFjLkP-h82e0RGP2GUAcg_WOI77v68";
+const SUPABASE_ANON_KEY = "sb_publishable_RFjLKP-h82e0RGP2GUAcg_W0I77v68";
 
 /* ===== INIT (IMPORTANT: name it sb, NOT supabase) ===== */
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ===== FUNCTIONS ===== */
 async function login() {
@@ -84,6 +84,5 @@ document.getElementById("btnLogin").addEventListener("click", login);
  document.getElementById("btnLogout").addEventListener("click", logout);
 document.getElementById("btnAdd").addEventListener("click", addBook);
 </script>
-
 </body>
 </html>
