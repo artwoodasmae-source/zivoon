@@ -2,254 +2,143 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Zivoon Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <style>
-    :root{
-      --brand:#2f5bea;  /* خاصها تطابق index */
-      --bg:#f4f6fb;
-      --card:#fff;
-      --text:#1f2330;
-      --muted:#6b7280;
-      --line:#e7eaf2;
-      --shadow:0 10px 25px rgba(18, 28, 45, .08);
-      --radius:16px;
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 0;
     }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);}
-    header{background:var(--brand);color:#fff;box-shadow:0 8px 24px rgba(47,91,234,.25);}
-    .top{max-width:900px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:14px;}
-    .logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.3px;font-size:18px;user-select:none;}
-    .dot{width:12px;height:12px;border-radius:50%;background:#fff;opacity:.9;box-shadow:0 0 0 4px rgba(255,255,255,.18);}
-    .pill{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.15);color:#fff;padding:8px 12px;border-radius:999px;font-size:13px;text-decoration:none;display:inline-flex;align-items:center}
-    .pill:hover{background:rgba(255,255,255,.22);}
-    .wrap{max-width:900px;margin:18px auto;padding:0 16px 40px;}
-    .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;}
-    .titleRow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-    h2{margin:0;font-size:18px;}
-    .hint{color:var(--muted);font-size:13px;line-height:1.6;}
-    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
-    input, textarea, select{
-      width:100%;padding:10px;border-radius:12px;border:1px solid #e5e7eb;outline:none;background:#fff;font-size:14px;
+
+    header {
+      background: #1e40af;
+      color: white;
+      padding: 15px 20px;
+      font-size: 20px;
+      font-weight: bold;
     }
-    textarea{min-height:90px;resize:vertical;}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
-    .full{grid-column:1 / -1;}
-    .btn{border:none;cursor:pointer;border-radius:12px;padding:10px 12px;font-weight:800;}
-    .btn.primary{background:var(--brand);color:#fff;}
-    .btn.ghost{background:#f3f4f6;border:1px solid #e5e7eb;color:#111827;}
-    .hide{display:none;}
-    .ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:10px;border-radius:12px;margin-top:10px;}
-    .bad{background:#fef2f2;border:1px solid #fecaca;color:#7f1d1d;padding:10px;border-radius:12px;margin-top:10px;}
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    input, select, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      font-size: 14px;
+    }
+
+    button {
+      background: #1e40af;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    button:hover {
+      background: #1636a0;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .msg {
+      margin-top: 10px;
+      color: green;
+      font-size: 14px;
+    }
   </style>
 </head>
+
 <body>
-<header>
-  <div class="top">
-    <div class="logo"><span class="dot"></span> <span>Zivoon Admin</span></div>
-    <a class="pill" href="index.html">Back to site</a>
-  </div>
-</header>
 
-<div class="wrap">
-  <div class="panel">
-    <div class="titleRow">
-      <h2>Login</h2>
-      <div class="hint">Enter your admin code to add books.</div>
-    </div>
+<header>Zivoon Admin</header>
 
-    <div class="row">
-      <div style="flex:1;min-width:220px;">
-        <input id="code" placeholder="Admin code (example: ZV-2025-ADMIN)" />
-      </div>
-      <button class="btn primary" id="btnLogin">Unlock</button>
-      <button class="btn ghost hide" id="btnLogout">Logout</button>
-      <button class="btn ghost" id="btnReset">Reset local data</button>
-    </div>
+<div class="container" id="loginBox">
+  <h2>Login</h2>
+  <input type="password" id="adminCode" placeholder="Enter admin code" />
+  <button onclick="login()">Unlock</button>
+  <div class="msg" id="loginMsg"></div>
+</div>
 
-    <div id="msg"></div>
+<div class="container hidden" id="adminPanel">
+  <h2>Add Book</h2>
 
-    <div id="adminArea" class="hide" style="margin-top:12px;border-top:1px dashed var(--line);padding-top:12px;">
-      <div class="titleRow">
-        <h2>Add a new book</h2>
-        <div class="hint">This saves on this device (LocalStorage).</div>
-      </div>
+  <input type="text" id="title" placeholder="Book title" />
+  <input type="text" id="author" placeholder="Author" />
+  <select id="category">
+    <option>Best Books</option>
+    <option>New</option>
+    <option>Popular</option>
+  </select>
+  <input type="text" id="cover" placeholder="Cover image URL" />
+  <textarea id="desc" placeholder="Description"></textarea>
 
-      <div class="grid">
-        <div>
-          <div class="hint" style="font-weight:800;margin:6px 0;">Title</div>
-          <input id="fTitle" placeholder="Book title"/>
-        </div>
-        <div>
-          <div class="hint" style="font-weight:800;margin:6px 0;">Author</div>
-          <input id="fAuthor" placeholder="Author name"/>
-        </div>
-        <div>
-          <div class="hint" style="font-weight:800;margin:6px 0;">Category</div>
-          <select id="fCategory"></select>
-        </div>
-        <div>
-          <div class="hint" style="font-weight:800;margin:6px 0;">Rating (0-5)</div>
-          <input id="fRating" type="number" min="0" max="5" step="0.1" placeholder="4.5"/>
-        </div>
-
-        <div class="full">
-          <div class="hint" style="font-weight:800;margin:6px 0;">Cover Image URL</div>
-          <input id="fCover" placeholder="https://...jpg (optional)"/>
-        </div>
-
-        <div class="full">
-          <div class="hint" style="font-weight:800;margin:6px 0;">Description</div>
-          <textarea id="fDesc" placeholder="Short description..."></textarea>
-        </div>
-      </div>
-
-      <div class="row">
-        <button class="btn primary" id="btnAdd">Add Book</button>
-        <button class="btn ghost" id="btnSample">Fill sample</button>
-      </div>
-    </div>
-  </div>
+  <button onclick="addBook()">Add Book</button>
+  <div class="msg" id="addMsg"></div>
 </div>
 
 <script>
-  // نفس الكود اللي عندك
-  const ADMIN_CODE = "ZV-2025-ADMIN";
-  const STORAGE_KEY = "zivoon_books_v1";
+  const ADMIN_CODE = "ZIVOON-ADMIN-2025";
+  const STORAGE_KEY = "zivoon_books";
 
-  const categories = ["Best Books","Fantasy","Epic Fantasy","Young Adult","Romance","Thriller","Business","Self-Help","Biography","History","Science"];
-
-  const code = document.getElementById("code");
-  const btnLogin = document.getElementById("btnLogin");
-  const btnLogout = document.getElementById("btnLogout");
-  const btnReset = document.getElementById("btnReset");
-  const adminArea = document.getElementById("adminArea");
-  const msg = document.getElementById("msg");
-
-  const fTitle = document.getElementById("fTitle");
-  const fAuthor = document.getElementById("fAuthor");
-  const fCategory = document.getElementById("fCategory");
-  const fRating = document.getElementById("fRating");
-  const fCover = document.getElementById("fCover");
-  const fDesc = document.getElementById("fDesc");
-  const btnAdd = document.getElementById("btnAdd");
-  const btnSample = document.getElementById("btnSample");
-
-  let unlocked = false;
-
-  // fill categories
-  categories.forEach(c=>{
-    const o=document.createElement("option");
-    o.value=c; o.textContent=c;
-    fCategory.appendChild(o);
-  });
-  fCategory.value="Best Books";
-
-  btnLogin.onclick = () => {
-    const v = (code.value||"").trim();
-    if(v === ADMIN_CODE){
-      unlocked = true;
-      adminArea.classList.remove("hide");
-      btnLogout.classList.remove("hide");
-      showOk("✅ Admin unlocked!");
+  function login() {
+    const input = document.getElementById("adminCode").value;
+    if (input === ADMIN_CODE) {
+      document.getElementById("loginBox").classList.add("hidden");
+      document.getElementById("adminPanel").classList.remove("hidden");
     } else {
-      showBad("❌ Wrong code");
+      document.getElementById("loginMsg").innerText = "Wrong admin code";
     }
-  };
+  }
 
-  btnLogout.onclick = () => {
-    unlocked = false;
-    adminArea.classList.add("hide");
-    btnLogout.classList.add("hide");
-    showOk("Logged out.");
-  };
+  function addBook() {
+    const title = document.getElementById("title").value.trim();
+    const author = document.getElementById("author").value.trim();
+    const category = document.getElementById("category").value;
+    const cover = document.getElementById("cover").value.trim();
+    const desc = document.getElementById("desc").value.trim();
 
-  btnReset.onclick = () => {
-    const ok = confirm("Reset local books on this device? (site will return to default)");
-    if(!ok) return;
-    localStorage.removeItem(STORAGE_KEY);
-    showOk("Done ✅ Now open the site and refresh.");
-  };
-
-  btnSample.onclick = () => {
-    if(!unlocked) return showBad("Admin locked.");
-    fTitle.value="Atomic Habits";
-    fAuthor.value="James Clear";
-    fCategory.value="Self-Help";
-    fRating.value="4.6";
-    fCover.value="";
-    fDesc.value="A practical guide to building good habits, breaking bad ones, and getting 1% better every day.";
-  };
-
-  btnAdd.onclick = () => {
-    if(!unlocked) return showBad("Admin locked.");
-    const title = (fTitle.value||"").trim();
-    const author = (fAuthor.value||"").trim();
-    const category = fCategory.value;
-    const rating = parseFloat(fRating.value || "0");
-    const cover = (fCover.value||"").trim();
-    const desc = (fDesc.value||"").trim();
-
-    if(!title || !author) return showBad("Title and Author are required.");
-    if(Number.isNaN(rating) || rating < 0 || rating > 5) return showBad("Rating must be between 0 and 5.");
+    if (!title || !author) {
+      return;
+    }
 
     const book = {
-      id: id(),
-      title, author, category,
-      rating,
-      cover: cover || placeholder(title, author),
-      desc: desc || "No description yet."
+      id: Date.now(),
+      title,
+      author,
+      category,
+      cover,
+      desc
     };
 
-    const list = loadBooks();
+    const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
     list.unshift(book);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
 
-    fTitle.value=""; fAuthor.value=""; fCategory.value="Best Books";
-    fRating.value=""; fCover.value=""; fDesc.value="";
-    showOk("✅ Book added! Open the site (Back to site) and refresh.");
-  };
+    document.getElementById("addMsg").innerText = "Book added ✔";
 
-  function loadBooks(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return [];
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
-    }catch(e){ return []; }
-  }
-
-  function showOk(t){ msg.innerHTML = <div class="ok">${esc(t)}</div>; }
-  function showBad(t){ msg.innerHTML = <div class="bad">${esc(t)}</div>; }
-  function esc(s){return String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");}
-
-  function placeholder(title, author){
-    const svg = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="360" height="520">
-        <defs>
-          <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0" stop-color="#eef2ff"/>
-            <stop offset="1" stop-color="#dbeafe"/>
-          </linearGradient>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#g)"/>
-        <rect x="28" y="28" width="304" height="464" rx="18" fill="#ffffff" opacity="0.9"/>
-        <text x="50%" y="46%" text-anchor="middle" font-family="Arial" font-size="28" font-weight="800" fill="#1f2330">
-          ${(String(title||"Book").replaceAll("&","and").replaceAll("<","").replaceAll(">",""))}
-        </text>
-        <text x="50%" y="54%" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700" fill="#6b7280">
-          ${(String(author||"").replaceAll("&","and").replaceAll("<","").replaceAll(">",""))}
-        </text>
-        <text x="50%" y="90%" text-anchor="middle" font-family="Arial" font-size="14" font-weight="700" fill="#2f5bea">Zivoon</text>
-      </svg>`;
-    return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
-  }
-
-  function id(){
-    const a = new Uint32Array(2);
-    crypto.getRandomValues(a);
-    return a[0].toString(16) + "-" + a[1].toString(16);
+    document.getElementById("title").value = "";
+    document.getElementById("author").value = "";
+    document.getElementById("cover").value = "";
+    document.getElementById("desc").value = "";
   }
 </script>
+
 </body>
 </html>
