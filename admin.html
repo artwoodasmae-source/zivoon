@@ -1,484 +1,429 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Zivoon Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin - Zivoon Books</title>
+  <link rel="stylesheet" href="./style.css" />
   <style>
-    :root{
-      --brand:#8b0000;
-      --bg:#0f0f0f;
-      --card:#161616;
-      --text:#f1f1f1;
-      --muted:#b3b3b3;
-      --border:#2a2a2a;
-      --ok:#16a34a;
-      --bad:#dc2626;
-      --radius:14px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: system-ui, Arial, sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
-    header{
-      background: linear-gradient(90deg, #8b0000, #4a0000);
-      padding:16px 20px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-    }
-    header .title{font-weight:900; letter-spacing:.5px}
-    header a{
-      color:#fff; text-decoration:none;
-      background: rgba(255,255,255,.14);
-      padding:8px 14px; border-radius:999px;
-      font-size:14px;
-    }
-
-    .wrap{
-      max-width:1100px;
-      margin:22px auto;
-      padding:0 16px 40px;
-      display:grid;
-      grid-template-columns: 380px 1fr;
-      gap:16px;
-    }
-    @media (max-width:920px){ .wrap{grid-template-columns:1fr;} }
-
-    .panel{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      padding:16px;
-    }
-    h2{margin:0 0 12px 0; font-size:18px}
-    .small{color:var(--muted); font-size:13px; line-height:1.5}
-
-    input, select, textarea, button{
-      width:100%;
-      padding:11px 12px;
-      border-radius:12px;
-      border:1px solid var(--border);
-      background:#101010;
-      color:var(--text);
-      outline:none;
-      font-size:14px;
-      margin-top:8px;
-    }
-    textarea{min-height:92px; resize:vertical;}
-    button{
-      cursor:pointer;
-      border:none;
-      font-weight:800;
-    }
-    .btnPrimary{background:var(--brand);}
-    .btnPrimary:hover{filter:brightness(1.05)}
-    .btnGhost{
-      background:transparent;
-      border:1px solid var(--border);
-    }
-    .btnDanger{background:var(--bad)}
-    .btnDanger:hover{filter:brightness(1.05)}
-
-    .row{display:flex; gap:10px; margin-top:10px}
-    .row > *{flex:1}
-    .hide{display:none}
-
-    .msg{
-      margin-top:10px;
-      padding:10px 12px;
-      border-radius:12px;
-      font-size:13px;
-      border:1px solid var(--border);
-      background:#111;
-      color:var(--muted);
-    }
-    .msg.ok{border-color: rgba(22,163,74,.5); color:#bbf7d0}
-    .msg.bad{border-color: rgba(220,38,38,.6); color:#fecaca}
-
-    .list{display:flex; flex-direction:column; gap:10px; margin-top:12px}
-    .item{
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:12px;
-      display:flex;
-      gap:12px;
-      align-items:flex-start;
-      background:#121212;
-    }
-    .thumb{
-      width:62px; height:86px;
-      border-radius:10px;
-      border:1px solid var(--border);
-      object-fit:cover;
-      background:#0b0b0b;
-      flex:0 0 auto;
-    }
-    .info{flex:1}
-    .info .t{font-weight:900; margin:0 0 4px 0}
-    .info .m{color:var(--muted); font-size:13px; margin:0}
-    .info .d{color:#ddd; font-size:13px; margin:8px 0 0 0; line-height:1.5}
-    .actions{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap}
-    .actions button{width:auto; padding:8px 10px; border-radius:12px; font-size:13px}
-    .tag{
-      display:inline-block;
-      margin-top:8px;
-      padding:4px 10px;
-      background: rgba(139,0,0,.25);
-      border:1px solid rgba(139,0,0,.5);
-      border-radius:999px;
-      font-size:12px;
-      color:#fff;
-      width:fit-content;
-    }
+    /* Small admin UI (you can move to style.css later) */
+    .wrap{max-width:1100px;margin:24px auto;padding:0 16px;}
+    .card{background:#fff;border:1px solid #e7e7e7;border-radius:14px;padding:16px;margin:12px 0;box-shadow:0 2px 10px rgba(0,0,0,.03)}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .row > div{flex:1;min-width:220px}
+    label{display:block;font-size:13px;margin:10px 0 6px;color:#333}
+    input, textarea, select{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:10px;font-size:14px}
+    textarea{min-height:90px;resize:vertical}
+    button{padding:10px 14px;border:0;border-radius:10px;cursor:pointer;font-weight:600}
+    .btn{background:#16a34a;color:#fff}
+    .btn2{background:#0ea5e9;color:#fff}
+    .btnDanger{background:#ef4444;color:#fff}
+    .btnGhost{background:#f3f4f6}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .muted{color:#666;font-size:13px}
+    .hidden{display:none !important}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;vertical-align:top}
+    th{font-size:13px;color:#444}
+    .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#f3f4f6;font-size:12px;color:#333}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .status{font-size:13px;color:#111}
+    .ok{color:#16a34a}
+    .err{color:#ef4444}
   </style>
+
+  <!-- Supabase JS (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-
 <body>
-<header>
-  <div class="title">Zivoon Admin</div>
-  <a href="./index.html">Back to site</a>
-</header>
-
-<div class="wrap">
-
-  <!-- LOGIN -->
-  <section class="panel" id="loginPanel">
-    <h2>Login</h2>
-    <div class="small">Enter your admin code to manage books.</div>
-
-    <input type="password" id="adminCode" placeholder="Admin code" autocomplete="off" />
-    <button class="btnPrimary" id="unlockBtn">Unlock</button>
-
-    <div id="loginMsg" class="msg">Tip: keep your code private.</div>
-  </section>
-
-  <!-- ADMIN -->
-  <section class="panel hide" id="adminPanel">
-    <h2 id="formTitle">Add Book</h2>
-    <div class="small" id="formHint">Fill the fields and click “Save Book”.</div>
-
-    <input type="text" id="title" placeholder="Book title" />
-    <input type="text" id="author" placeholder="Author" />
-
-    <select id="category">
-      <option>Best Books</option>
-      <option>New</option>
-      <option>Popular</option>
-    </select>
-
-    <input type="text" id="price" placeholder="Price (e.g. 7.99)" />
-    <input type="text" id="rating" placeholder="Rating (0 - 5) e.g. 4.7" />
-    <input type="text" id="cover" placeholder="Cover image URL (https://...jpg)" />
-    <textarea id="desc" placeholder="Description (EN + AR)"></textarea>
-
-    <div class="row">
-      <button class="btnPrimary" id="saveBtn">Save Book</button>
-      <button class="btnGhost" id="cancelBtn">Cancel Edit</button>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h2 style="margin:0">Admin Panel</h2>
+        <div class="muted">Manage books in Supabase (CRUD)</div>
+      </div>
+      <div class="actions">
+        <span id="who" class="pill hidden"></span>
+        <button id="btnLogout" class="btnGhost hidden">Logout</button>
+      </div>
     </div>
 
-    <div class="row">
-      <button class="btnGhost" id="clearAllBtn">Clear ALL books</button>
-      <button class="btnGhost" id="logoutBtn">Logout</button>
+    <!-- LOGIN CARD -->
+    <div id="loginCard" class="card">
+      <h3 style="margin-top:0">Login</h3>
+      <div class="row">
+        <div>
+          <label>Email</label>
+          <input id="loginEmail" type="email" placeholder="you@example.com" />
+        </div>
+        <div>
+          <label>Password</label>
+          <input id="loginPassword" type="password" placeholder="••••••••" />
+        </div>
+      </div>
+      <div class="actions" style="margin-top:12px">
+        <button id="btnLogin" class="btn2">Sign in</button>
+      </div>
+      <div id="loginMsg" class="status" style="margin-top:10px"></div>
     </div>
 
-    <div id="adminMsg" class="msg">Your changes are saved on this device (localStorage).</div>
-  </section>
+    <!-- ADMIN CARD -->
+    <div id="adminCard" class="card hidden">
+      <div class="topbar">
+        <h3 style="margin:0">Books</h3>
+        <div class="actions">
+          <button id="btnRefresh" class="btnGhost">Refresh</button>
+        </div>
+      </div>
 
-  <!-- LIST -->
-  <section class="panel hide" id="listPanel">
-    <h2>My Books</h2>
-    <div class="small">Edit or delete any book below.</div>
-    <div id="booksList" class="list"></div>
-  </section>
+      <!-- FORM -->
+      <div class="card" style="background:#fafafa">
+        <h4 style="margin:0 0 8px 0">Add / Edit book</h4>
+        <div class="muted">إذا بغيتي تزيدي جديد خلي id خاوِي، وإذا بغيتي تعدّلي اختاري Book من اللائحة وغادي يتعمر الفورم.</div>
 
-</div>
+        <div class="row" style="margin-top:10px">
+          <div>
+            <label>ID (auto)</label>
+            <input id="bookId" type="text" placeholder="(auto)" disabled />
+          </div>
+          <div>
+            <label>Title</label>
+            <input id="title" type="text" placeholder="Book title" />
+          </div>
+          <div>
+            <label>Author</label>
+            <input id="author" type="text" placeholder="Author name" />
+          </div>
+        </div>
 
-<script>
-  // ====== CONFIG ======
-  const ADMIN_CODE = "ZIVOON-ADMIN-2025";     // بدليه للكود ديالك
-  const STORAGE_KEY = "zivoon_books";         // خاصو يطابق index.html
+        <label>Description</label>
+        <textarea id="description" placeholder="Short description..."></textarea>
 
-  // ====== STATE ======
-  let editingId = null;
+        <div class="row">
+          <div>
+            <label>Price (USD)</label>
+            <input id="price" type="number" step="0.01" placeholder="9.99" />
+          </div>
+          <div>
+            <label>Rating (0-5)</label>
+            <input id="rating" type="number" step="0.1" min="0" max="5" placeholder="4.8" />
+          </div>
+          <div>
+            <label>Language</label>
+            <input id="language" type="text" placeholder="en,ar" />
+          </div>
+        </div>
 
-  // ====== ELEMENTS ======
-  const loginPanel = document.getElementById("loginPanel");
-  const adminPanel = document.getElementById("adminPanel");
-  const listPanel  = document.getElementById("listPanel");
+        <div class="actions" style="margin-top:12px">
+          <button id="btnSave" class="btn">Save (Insert/Update)</button>
+          <button id="btnClear" class="btnGhost">Clear</button>
+          <button id="btnDelete" class="btnDanger hidden">Delete</button>
+        </div>
 
-  const adminCode = document.getElementById("adminCode");
-  const unlockBtn = document.getElementById("unlockBtn");
-  const loginMsg  = document.getElementById("loginMsg");
+        <div id="formMsg" class="status" style="margin-top:10px"></div>
+      </div>
 
-  const titleEl = document.getElementById("title");
-  const authorEl = document.getElementById("author");
-  const catEl = document.getElementById("category");
-  const priceEl = document.getElementById("price");
-  const ratingEl = document.getElementById("rating");
-  const coverEl = document.getElementById("cover");
-  const descEl = document.getElementById("desc");
+      <!-- TABLE -->
+      <div class="card">
+        <div class="topbar">
+          <h4 style="margin:0">List</h4>
+          <div class="muted" id="count"></div>
+        </div>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Title / Author</th>
+                <th>Price</th>
+                <th>Rating</th>
+                <th>Language</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
-  const saveBtn = document.getElementById("saveBtn");
-  const cancelBtn = document.getElementById("cancelBtn");
-  const clearAllBtn = document.getElementById("clearAllBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
+  </div>
 
-  const formTitle = document.getElementById("formTitle");
-  const formHint = document.getElementById("formHint");
-  const adminMsg = document.getElementById("adminMsg");
+  <script>
+    // 1) PASTE YOUR SUPABASE KEYS HERE:
+    const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE";
+    const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
 
-  const booksList = document.getElementById("booksList");
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // ====== HELPERS ======
-  function loadBooks(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      const arr = JSON.parse(raw || "[]");
-      return Array.isArray(arr) ? arr : [];
-    }catch(e){
-      return [];
-    }
-  }
+    // UI refs
+    const loginCard = document.getElementById("loginCard");
+    const adminCard = document.getElementById("adminCard");
+    const who = document.getElementById("who");
+    const btnLogout = document.getElementById("btnLogout");
 
-  function saveBooks(list){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-  }
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPassword = document.getElementById("loginPassword");
+    const btnLogin = document.getElementById("btnLogin");
+    const loginMsg = document.getElementById("loginMsg");
 
-  function showMsg(el, text, type){
-    el.classList.remove("ok","bad");
-    if(type) el.classList.add(type);
-    el.textContent = text;
-  }
+    const bookId = document.getElementById("bookId");
+    const title = document.getElementById("title");
+    const author = document.getElementById("author");
+    const description = document.getElementById("description");
+    const price = document.getElementById("price");
+    const rating = document.getElementById("rating");
+    const language = document.getElementById("language");
 
-  function resetForm(){
-    editingId = null;
-    titleEl.value = "";
-    authorEl.value = "";
-    catEl.value = "Best Books";
-    priceEl.value = "";
-    ratingEl.value = "";
-    coverEl.value = "";
-    descEl.value = "";
+    const btnSave = document.getElementById("btnSave");
+    const btnClear = document.getElementById("btnClear");
+    const btnDelete = document.getElementById("btnDelete");
+    const formMsg = document.getElementById("formMsg");
 
-    formTitle.textContent = "Add Book";
-    formHint.textContent = "Fill the fields and click “Save Book”.";
-    cancelBtn.disabled = true;
-    cancelBtn.style.opacity = .6;
-  }
+    const btnRefresh = document.getElementById("btnRefresh");
+    const tbody = document.getElementById("tbody");
+    const count = document.getElementById("count");
 
-  function esc(s){
-    return String(s ?? "").replace(/[&<>"']/g, m => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-    }[m]));
-  }
+    let selectedRow = null;
 
-  function safeCover(url){
-    const u = String(url || "").trim();
-    if(!u) return "https://dummyimage.com/200x280/111/888&text=Cover";
-    return u;
-  }
-
-  // ====== RENDER LIST ======
-  function renderList(){
-    const list = loadBooks();
-    if(!list.length){
-      booksList.innerHTML = "<div class='msg'>No books yet.</div>";
-      return;
-    }
-
-    booksList.innerHTML = "";
-    list.forEach(b => {
-      const div = document.createElement("div");
-      div.className = "item";
-
-      const img = document.createElement("img");
-      img.className = "thumb";
-      img.src = safeCover(b.cover);
-      img.onerror = () => img.src = "https://dummyimage.com/200x280/111/888&text=Cover";
-
-      const info = document.createElement("div");
-      info.className = "info";
-      info.innerHTML = `
-        <p class="t">${esc(b.title || "Untitled")}</p>
-        <p class="m">${esc(b.author || "")} • ${esc(b.category || "")}</p>
-        <div class="tag">Price: ${esc(b.price || "—")} • Rating: ${esc(b.rating || "—")}</div>
-        <p class="d">${esc((b.desc || "").slice(0,160))}${(b.desc || "").length>160 ? "..." : ""}</p>
-      `;
-
-      const actions = document.createElement("div");
-      actions.className = "actions";
-
-      const btnEdit = document.createElement("button");
-      btnEdit.className = "btnGhost";
-      btnEdit.textContent = "Edit";
-      btnEdit.onclick = () => startEdit(b.id);
-
-      const btnDel = document.createElement("button");
-      btnDel.className = "btnDanger";
-      btnDel.textContent = "Delete";
-      btnDel.onclick = () => deleteBook(b.id);
-
-      actions.appendChild(btnEdit);
-      actions.appendChild(btnDel);
-      info.appendChild(actions);
-
-      div.appendChild(img);
-      div.appendChild(info);
-      booksList.appendChild(div);
-    });
-  }
-
-  // ====== CRUD ======
-  function startEdit(id){
-    const list = loadBooks();
-    const b = list.find(x => String(x.id) === String(id));
-    if(!b) return;
-
-    editingId = b.id;
-    titleEl.value = b.title || "";
-    authorEl.value = b.author || "";
-    catEl.value = b.category || "Best Books";
-    priceEl.value = b.price || "";
-    ratingEl.value = b.rating || "";
-    coverEl.value = b.cover || "";
-    descEl.value = b.desc || "";
-
-    formTitle.textContent = "Edit Book";
-    formHint.textContent = "Update fields and click “Save Book”.";
-    cancelBtn.disabled = false;
-    cancelBtn.style.opacity = 1;
-
-    showMsg(adminMsg, "Editing mode enabled ✅", "ok");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function deleteBook(id){
-    const ok = confirm("Delete this book?");
-    if(!ok) return;
-
-    const list = loadBooks().filter(x => String(x.id) !== String(id));
-    saveBooks(list);
-
-    if(String(editingId) === String(id)) resetForm();
-
-    showMsg(adminMsg, "Book deleted ✔", "ok");
-    renderList();
-  }
-
-  function upsertBook(){
-    const title = titleEl.value.trim();
-    const author = authorEl.value.trim();
-    const category = catEl.value;
-    const price = priceEl.value.trim();
-    const rating = ratingEl.value.trim();
-    const cover = coverEl.value.trim();
-    const desc = descEl.value.trim();
-
-    if(!title || !author){
-      showMsg(adminMsg, "Title and Author are required.", "bad");
-      return;
+    function setMsg(el, text, ok=true){
+      el.textContent = text || "";
+      el.className = "status " + (text ? (ok ? "ok" : "err") : "");
     }
 
-    // validate rating if entered
-    if(rating){
-      const r = Number(rating);
-      if(Number.isNaN(r) || r < 0 || r > 5){
-        showMsg(adminMsg, "Rating must be between 0 and 5.", "bad");
+    function showAdmin(email){
+      loginCard.classList.add("hidden");
+      adminCard.classList.remove("hidden");
+      who.classList.remove("hidden");
+      btnLogout.classList.remove("hidden");
+      who.textContent = email || "authenticated";
+    }
+
+    function showLogin(){
+      adminCard.classList.add("hidden");
+      loginCard.classList.remove("hidden");
+      who.classList.add("hidden");
+      btnLogout.classList.add("hidden");
+      clearForm();
+    }
+
+    function clearForm(){
+      selectedRow = null;
+      bookId.value = "";
+      title.value = "";
+      author.value = "";
+      description.value = "";
+      price.value = "";
+      rating.value = "";
+      language.value = "";
+      btnDelete.classList.add("hidden");
+      setMsg(formMsg, "");
+    }
+
+    async function loadBooks(){
+      setMsg(formMsg, "");
+      tbody.innerHTML = "<tr><td colspan='7' class='muted'>Loading...</td></tr>";
+
+      const { data, error } = await sb
+        .from("books")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if(error){
+        tbody.innerHTML = "";
+        count.textContent = "";
+        setMsg(formMsg, "Error loading books: " + error.message, false);
         return;
       }
-    }
-    // validate price if entered
-    if(price){
-      const p = Number(price);
-      if(Number.isNaN(p) || p < 0){
-        showMsg(adminMsg, "Price must be a positive number.", "bad");
+
+      count.textContent = ${data.length} items;
+      tbody.innerHTML = "";
+
+      if(data.length === 0){
+        tbody.innerHTML = "<tr><td colspan='7' class='muted'>No books yet.</td></tr>";
         return;
       }
+
+      for(const row of data){
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>${row.id ?? ""}</td>
+          <td>
+            <div><strong>${escapeHtml(row.title ?? "")}</strong></div>
+            <div class="muted">${escapeHtml(row.author ?? "")}</div>
+          </td>
+          <td>${row.price ?? ""}</td>
+          <td>${row.rating ?? ""}</td>
+          <td>${escapeHtml(row.language ?? "")}</td>
+          <td class="muted">${row.created_at ? new Date(row.created_at).toLocaleString() : ""}</td>
+          <td>
+            <div class="actions">
+              <button class="btnGhost" data-edit="${row.id}">Edit</button>
+              <button class="btnDanger" data-del="${row.id}">Delete</button>
+            </div>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      }
+
+      // Attach handlers for edit/delete buttons
+      tbody.querySelectorAll("[data-edit]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id = btn.getAttribute("data-edit");
+          await editBook(id);
+        });
+      });
+
+      tbody.querySelectorAll("[data-del]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id = btn.getAttribute("data-del");
+          await deleteBook(id);
+        });
+      });
     }
 
-    const list = loadBooks();
+    async function editBook(id){
+      setMsg(formMsg, "");
+      const { data, error } = await sb
+        .from("books")
+        .select("*")
+        .eq("id", id)
+        .single();
 
-    if(editingId){
-      const idx = list.findIndex(x => String(x.id) === String(editingId));
-      if(idx !== -1){
-        list[idx] = {
-          ...list[idx],
-          title, author, category,
-          price, rating,
-          cover, desc
-        };
-        saveBooks(list);
-        showMsg(adminMsg, "Book updated ✔", "ok");
-      } else {
-        showMsg(adminMsg, "Could not find book to update.", "bad");
+      if(error){
+        setMsg(formMsg, "Error loading book: " + error.message, false);
+        return;
       }
-    } else {
-      const book = {
-        id: Date.now(),
-        title, author, category,
-        price, rating,
-        cover, desc
+
+      selectedRow = data;
+      bookId.value = data.id ?? "";
+      title.value = data.title ?? "";
+      author.value = data.author ?? "";
+      description.value = data.description ?? "";
+      price.value = data.price ?? "";
+      rating.value = data.rating ?? "";
+      language.value = data.language ?? "";
+
+      btnDelete.classList.remove("hidden");
+      setMsg(formMsg, "Loaded for edit ✅", true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function saveBook(){
+      setMsg(formMsg, "");
+
+      // Basic validation
+      if(!title.value.trim()){
+        setMsg(formMsg, "Title is required.", false);
+        return;
+      }
+
+      const payload = {
+        title: title.value.trim(),
+        author: author.value.trim() || null,
+        description: description.value.trim() || null,
+        price: price.value !== "" ? Number(price.value) : null,
+        rating: rating.value !== "" ? Number(rating.value) : null,
+        language: language.value.trim() || null
       };
-      list.unshift(book);
-      saveBooks(list);
-      showMsg(adminMsg, "Book added ✔", "ok");
+
+      if(bookId.value){
+        // UPDATE
+        const id = Number(bookId.value);
+        const { error } = await sb.from("books").update(payload).eq("id", id);
+        if(error){
+          setMsg(formMsg, "Update failed: " + error.message, false);
+          return;
+        }
+        setMsg(formMsg, "Updated ✅", true);
+      } else {
+        // INSERT
+        const { error } = await sb.from("books").insert(payload);
+        if(error){
+          setMsg(formMsg, "Insert failed: " + error.message, false);
+          return;
+        }
+        setMsg(formMsg, "Added ✅", true);
+      }
+
+      clearForm();
+      await loadBooks();
     }
 
-    resetForm();
-    renderList();
-  }
+    async function deleteBook(idFromList){
+      const id = idFromList ? Number(idFromList) : (bookId.value ? Number(bookId.value) : null);
+      if(!id) return;
 
-  function clearAll(){
-    const ok = confirm("This will delete ALL books on this device. Continue?");
-    if(!ok) return;
-    localStorage.removeItem(STORAGE_KEY);
-    resetForm();
-    renderList();
-    showMsg(adminMsg, "All books cleared ✔", "ok");
-  }
+      const ok = confirm("Delete this book? (id: " + id + ")");
+      if(!ok) return;
 
-  // ====== LOGIN / LOGOUT ======
-  function unlock(){
-    const v = adminCode.value.trim();
-    if(v === ADMIN_CODE){
-      loginPanel.classList.add("hide");
-      adminPanel.classList.remove("hide");
-      listPanel.classList.remove("hide");
-      resetForm();
-      renderList();
-      showMsg(loginMsg, "Unlocked ✅", "ok");
-    } else {
-      showMsg(loginMsg, "Wrong code ❌", "bad");
+      const { error } = await sb.from("books").delete().eq("id", id);
+      if(error){
+        setMsg(formMsg, "Delete failed: " + error.message, false);
+        return;
+      }
+
+      setMsg(formMsg, "Deleted ✅", true);
+      clearForm();
+      await loadBooks();
     }
-  }
 
-  function logout(){
-    adminCode.value = "";
-    loginPanel.classList.remove("hide");
-    adminPanel.classList.add("hide");
-    listPanel.classList.add("hide");
-    showMsg(loginMsg, "Logged out.", "");
-  }
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
 
-  // ====== EVENTS ======
-  unlockBtn.addEventListener("click", unlock);
-  adminCode.addEventListener("keydown", (e)=>{ if(e.key==="Enter") unlock(); });
+    // Auth
+    btnLogin.addEventListener("click", async ()=>{
+      setMsg(loginMsg, "");
 
-  saveBtn.addEventListener("click", upsertBook);
-  cancelBtn.addEventListener("click", ()=>{ resetForm(); showMsg(adminMsg, "Edit cancelled.", ""); });
-  clearAllBtn.addEventListener("click", clearAll);
-  logoutBtn.addEventListener("click", logout);
+      const email = loginEmail.value.trim();
+      const pass = loginPassword.value;
 
-  // default
-  cancelBtn.disabled = true;
-  cancelBtn.style.opacity = .6;
-</script>
+      if(!email || !pass){
+        setMsg(loginMsg, "دخل email و password.", false);
+        return;
+      }
 
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+      if(error){
+        setMsg(loginMsg, "Login error: " + error.message, false);
+        return;
+      }
+
+      setMsg(loginMsg, "Logged in ✅", true);
+      showAdmin(data.user?.email);
+      await loadBooks();
+    });
+
+    btnLogout.addEventListener("click", async ()=>{
+      await sb.auth.signOut();
+      showLogin();
+    });
+
+    btnRefresh.addEventListener("click", loadBooks);
+    btnSave.addEventListener("click", saveBook);
+    btnClear.addEventListener("click", clearForm);
+    btnDelete.addEventListener("click", ()=>deleteBook());
+
+    // On page load: check session
+    (async ()=>{
+      const { data } = await sb.auth.getSession();
+      const session = data.session;
+      if(session?.user){
+        showAdmin(session.user.email);
+        await loadBooks();
+      } else {
+        showLogin();
+      }
+    })();
+  </script>
 </body>
 </html>
