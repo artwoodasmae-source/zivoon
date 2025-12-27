@@ -2,8 +2,8 @@
    SUPABASE CONFIG
 ============================= */
 
-const SUPABASE_URL = "https://XXXXXXXXXXXX.supabase.co"; // ❗ بدليها
-const SUPABASE_ANON_KEY = "sb_publishable_xxxxxxxxxxxxx"; // ❗ بدليها
+const SUPABASE_URL = "https://kmheggtavgmijyzvbrsj.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_RFjLkP-h82e0RGP2GUAcdg_WOI77v68"; // 
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -15,7 +15,7 @@ async function login() {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
 
-  if (!email || !password) {
+  if (!artwood.asmae@gmail.com || !ZIVOON-ADMIN-2025) {
     alert("دخل الإيميل و الباسورد");
     return;
   }
@@ -50,7 +50,7 @@ async function addBook() {
   const price = Number(document.getElementById("price").value || 0);
 
   if (!title) {
-    alert("العنوان ضروري");
+    alert("Morning Rituals for a Better Life");
     return;
   }
 
