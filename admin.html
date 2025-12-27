@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+[15:29, 27/12/2025] 😊🩷: https://zivoon.com/admin.html
+[15:31, 27/12/2025] 😊🩷: <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -9,94 +10,70 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f6f8;
-      padding: 30px;
-    }
-    .box {
-      max-width: 420px;
-      margin: auto;
-      background: #fff;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.1);
-    }
-    h2 { margin-top: 0; }
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-    }
-    button {
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .hidden { display: none; }
-    .error { color: red; margin-top: 10px; }
+    body{font-family:Arial,sans-serif;background:#f5f6f8;padding:30px}
+    .box{max-width:420px;margin:auto;background:#fff;padding:25px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.1)}
+    h2{margin-top:0}
+    input,button{width:100%;padding:12px;margin-top:10px}
+    button{background:#2563eb;color:#fff;border:none;border-radius:6px;cursor:pointer}
+    .hidden{display:none}
+    .error{color:red;margin-top:10px}
   </style>
 </head>
 
 <body>
-
 <div id="loginBox" class="box">
   <h2>Admin Login</h2>
   <input id="email" type="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
-  <button onclick="login()">Sign in</button>
+  <button id="btnLogin">Sign in</button>
   <div id="error" class="error"></div>
 </div>
 
 <div id="dashboard" class="box hidden">
   <h2>Welcome Admin 👋</h2>
   <p>You are successfully logged in.</p>
-  <button onclick="logout()">Logout</button>
+  <button id="btnLogout">Logout</button>
 </div>
 
 <script>
-  // 🔴 بدلي هاد القيم فقط
+  // ✅ بدّلي هاد جوج
   const SUPABASE_URL = "https://kmheqgtavgmljyzvbrsj.supabase.co";
   const SUPABASE_ANON_KEY = "PUT_YOUR_PUBLISHABLE_KEY_HERE";
 
-  const supabase = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
+  // ✅ مهم: نخلي الاسم supabaseClient باش مايتصادمش مع المكتبة
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   async function login() {
-    const email = document.getElementById("email").value;
+    document.getElementById("error").innerText = "";
+    const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
     if (error) {
       document.getElementById("error").innerText = error.message;
-    } else {
-      location.reload();
+      return;
     }
+    location.reload();
   }
 
   async function logout() {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
     location.reload();
   }
 
   async function checkSession() {
-    const { data } = await supabase.auth.getSession();
-    if (data.session) {
+    const { data } = await supabaseClient.auth.getSession();
+    if (data && data.session) {
       document.getElementById("loginBox").classList.add("hidden");
       document.getElementById("dashboard").classList.remove("hidden");
     }
   }
 
+  document.getElementById("btnLogin").addEventListener("click", login);
+  document.getElementById("btnLogout").addEventListener("click", logout);
+
   checkSession();
 </script>
-
 </body>
 </html>
