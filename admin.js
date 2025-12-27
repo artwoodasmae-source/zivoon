@@ -15,10 +15,10 @@ async function login() {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
 
-  if (!artwood.asmae@gmail.com || !ZIVOON-ADMIN-2025) {
-    alert("دخل الإيميل و الباسورد");
-    return;
-  }
+ if (email !== "artwood.asmae@gmail.com" || password !== "ZIVOON-ADMIN-2025") {
+  alert("إيميل أو كلمة السر غير صحيحة");
+  return;
+}
 
   const { data, error } = await sb.auth.signInWithPassword({
     email,
