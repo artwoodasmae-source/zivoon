@@ -1,156 +1,165 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Zivoon Books</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="./style.css" />
-</head>
-<body>
+:root{
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --brand:#1e40af;
+  --border:#e5e7eb;
+}
 
-<header>
-  <div class="left">Zivoon</div>
-  <input id="q" placeholder="Search books, authors..." />
-  <a href="./admin.html">Admin</a>
-</header>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
 
-<div class="container">
-  <aside class="panel">
-    <h2>Categories</h2>
-    <div class="small">Click to filter.</div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
-      <button class="catBtn" data-cat="All">All</button>
-      <button class="catBtn" data-cat="Best Books">Best Books</button>
-      <button class="catBtn" data-cat="New">New</button>
-      <button class="catBtn" data-cat="Popular">Popular</button>
-    </div>
-    <div class="small" style="margin-top:12px">
-      Add books from the <b>Admin</b> page.
-    </div>
-  </aside>
+header{
+  background:var(--brand);
+  color:#fff;
+  padding:14px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+header .left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-weight:bold;
+}
+header input{
+  flex:1;
+  max-width:820px;
+  padding:10px 12px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.25);
+  outline:none;
+}
+header a{
+  color:#fff;
+  text-decoration:none;
+  font-size:14px;
+  opacity:.9;
+}
 
-  <main>
-    <div class="panel" style="margin-bottom:12px">
-      <h2 id="heading">Best Books</h2>
-      <div class="small" id="count"></div>
-    </div>
+.container{
+  max-width:1100px;
+  margin:22px auto;
+  padding:0 16px;
+  display:grid;
+  grid-template-columns:260px 1fr;
+  gap:16px;
+}
 
-    <div class="grid" id="grid"></div>
-  </main>
-</div>
+.panel{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:14px;
+  box-shadow:0 10px 25px rgba(0,0,0,.06);
+}
 
-<!-- Modal -->
-<div class="modal" id="modal">
-  <div class="box">
-    <div class="boxHeader">
-      <div id="mTitle" style="font-weight:700"></div>
-      <button class="close" onclick="closeModal()">Close</button>
-    </div>
-    <div class="boxBody">
-      <img id="mImg" alt="" />
-      <div>
-        <div id="mAuthor" class="small"></div>
-        <div id="mCat" style="margin-top:10px"></div>
-        <p id="mDesc" style="margin-top:12px;line-height:1.5"></p>
-      </div>
-    </div>
-  </div>
-</div>
+h2{margin:0 0 10px 0; font-size:18px}
+.small{color:var(--muted); font-size:13px; margin-top:6px}
 
-<script>
-  const STORAGE_KEY = "zivoon_books";
-  let currentCat = "Best Books";
-  let all = [];
+.grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap:14px;
+}
 
-  function loadBooks(){
-    all = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-  }
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 10px 25px rgba(0,0,0,.06);
+  cursor:pointer;
+  transition: transform .12s ease;
+}
+.card:hover{ transform: translateY(-2px); }
 
-  function filterBooks(){
-    const q = document.getElementById("q").value.trim().toLowerCase();
-    let list = all;
+.cover{
+  height:240px;
+  background:#e2e8f0;
+}
+.cover img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
 
-    if(currentCat !== "All"){
-      list = list.filter(b => (b.category || "Best Books") === currentCat);
-    }
+.card .meta{
+  padding:10px 10px 12px;
+}
+.title{
+  font-size:14px;
+  font-weight:700;
+  margin:0 0 4px 0;
+  line-height:1.2;
+}
+.author{
+  font-size:12px;
+  color:var(--muted);
+  margin:0;
+}
 
-    if(q){
-      list = list.filter(b =>
-        (b.title || "").toLowerCase().includes(q) ||
-        (b.author || "").toLowerCase().includes(q)
-      );
-    }
+.badge{
+  display:inline-block;
+  font-size:11px;
+  color:#fff;
+  background:var(--brand);
+  padding:4px 8px;
+  border-radius:999px;
+  margin-top:8px;
+}
 
-    render(list);
-  }
-
-  function render(list){
-    document.getElementById("heading").innerText = currentCat === "All" ? "All Books" : currentCat;
-    document.getElementById("count").innerText = list.length ? ${list.length} book(s) : "No books yet. Go to Admin to add your first book.";
-
-    const grid = document.getElementById("grid");
-    grid.innerHTML = "";
-
-    list.forEach(b => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.onclick = () => openModal(b);
-
-      const cover = document.createElement("div");
-      cover.className = "cover";
-      cover.innerHTML = b.cover
-        ? <img src="${b.cover}" alt="">
-        : <div style="height:100%;display:flex;align-items:center;justify-content:center;color:#64748b">No cover</div>;
-
-      const meta = document.createElement("div");
-      meta.className = "meta";
-      meta.innerHTML = `
-        <div class="title">${escapeHtml(b.title || "Untitled")}</div>
-        <div class="author">${escapeHtml(b.author || "")}</div>
-        <span class="badge">${escapeHtml(b.category || "Best Books")}</span>
-      `;
-
-      card.appendChild(cover);
-      card.appendChild(meta);
-      grid.appendChild(card);
-    });
-  }
-
-  function openModal(b){
-    document.getElementById("mTitle").innerText = b.title || "Untitled";
-    document.getElementById("mAuthor").innerText = b.author ? By ${b.author} : "";
-    document.getElementById("mCat").innerHTML = <span class="badge">${b.category || "Best Books"}</span>;
-    document.getElementById("mDesc").innerText = b.desc || "No description yet.";
-    document.getElementById("mImg").src = b.cover || "";
-    document.getElementById("modal").classList.add("show");
-  }
-  function closeModal(){
-    document.getElementById("modal").classList.remove("show");
-  }
-
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, m => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-    }[m]));
-  }
-
-  document.getElementById("q").addEventListener("input", filterBooks);
-
-  document.querySelectorAll(".catBtn").forEach(btn=>{
-    btn.style.border = "1px solid #e5e7eb";
-    btn.style.background = "#fff";
-    btn.style.padding = "8px 10px";
-    btn.style.borderRadius = "10px";
-    btn.style.cursor = "pointer";
-    btn.onclick = () => {
-      currentCat = btn.dataset.cat;
-      filterBooks();
-    };
-  });
-
-  loadBooks();
-  filterBooks();
-</script>
-
-</body>
-</html>
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.55);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+}
+.modal.show{ display:flex; }
+.modal .box{
+  width:min(760px, 100%);
+  background:#fff;
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid var(--border);
+}
+.modal .boxHeader{
+  padding:12px 14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid var(--border);
+}
+.modal .boxBody{
+  display:grid;
+  grid-template-columns: 280px 1fr;
+  gap:14px;
+  padding:14px;
+}
+.modal .boxBody img{
+  width:100%;
+  height:360px;
+  object-fit:cover;
+  border-radius:12px;
+  background:#e2e8f0;
+}
+.modal .close{
+  border:none;
+  background:#ef4444;
+  color:#fff;
+  border-radius:10px;
+  padding:8px 10px;
+  cursor:pointer;
+}
