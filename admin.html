@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Admin – Zivoon Books</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,185 +11,124 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f2f4f8;
-      margin: 0;
-      padding: 0;
+      background: #f5f7fa;
     }
-
     .box {
       max-width: 420px;
       margin: 80px auto;
       background: #fff;
       padding: 24px;
       border-radius: 8px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 15px rgba(0,0,0,.1);
     }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
+    h2 { text-align: center; }
     input, textarea, button {
       width: 100%;
       padding: 10px;
       margin-bottom: 12px;
-      font-size: 14px;
     }
-
     button {
       background: #2563eb;
       color: white;
       border: none;
       cursor: pointer;
-      border-radius: 4px;
     }
-
-    button.logout {
-      background: #dc2626;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    #books div {
-      background: #f9fafb;
-      padding: 10px;
-      margin-bottom: 8px;
-      border-radius: 4px;
-      font-size: 13px;
-    }
+    .hidden { display: none; }
   </style>
 </head>
 
 <body>
 
-  <!-- LOGIN -->
-  <div class="box" id="loginBox">
-    <h2>Admin Login</h2>
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
-    <button type="button" onclick="login()">Sign in</button>
-  </div>
+<!-- LOGIN -->
+<div class="box" id="loginBox">
+  <h2>Admin Login</h2>
+  <input type="email" id="email" placeholder="Email" />
+  <input type="password" id="password" placeholder="Password" />
+  <button onclick="login()">Sign in</button>
+</div>
 
-  <!-- ADMIN PANEL -->
-  <div class="box hidden" id="adminBox">
-    <h2>Books Admin</h2>
+<!-- ADMIN -->
+<div class="box hidden" id="adminBox">
+  <h2>Books Admin</h2>
 
-    <input id="title" placeholder="Book title" />
-    <input id="author" placeholder="Author" />
-    <textarea id="description" placeholder="Description"></textarea>
-    <input id="price" type="number" step="0.01" placeholder="Price" />
+  <input id="title" placeholder="Book title" />
+  <input id="author" placeholder="Author" />
+  <textarea id="description" placeholder="Description"></textarea>
+  <input id="price" type="number" step="0.01" placeholder="Price" />
 
-    <button type="button" onclick="addBook()">Add book</button>
+  <button onclick="addBook()">Add book</button>
 
-    <hr />
+  <hr />
+  <div id="books"></div>
 
-    <div id="books"></div>
+  <button onclick="logout()">Logout</button>
+</div>
 
-    <button class="logout" type="button" onclick="logout()">Logout</button>
-  </div>
+<script>
+  // 🔐 SUPABASE CONFIG
+  const SUPABASE_URL = "https://XXXXXXXX.supabase.co";
+  const SUPABASE_ANON_KEY = "sb-public-XXXXXXXX";
 
-  <script>
-    // 🔑 SUPABASE CONFIG (ديالك)
-    const SUPABASE_URL = "https://kmheqtavgmljyzvbrsj.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_RFjLKP-h82e0RGP2GUACdg_WOI77v68";
+  const supabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
 
-    const supabase = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
+  // 🔑 LOGIN
+  async function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-    // ✅ LOGIN
-    async function login() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) {
-        alert(error.message);
-        return;
-      }
-
+    if (error) {
+      alert(error.message);
+    } else {
       document.getElementById("loginBox").classList.add("hidden");
       document.getElementById("adminBox").classList.remove("hidden");
-
       loadBooks();
     }
+  }
 
-    // ✅ LOGOUT
-    async function logout() {
-      await supabase.auth.signOut();
-      location.reload();
-    }
+  // ➕ ADD BOOK
+  async function addBook() {
+    const title = document.getElementById("title").value;
+    const author = document.getElementById("author").value;
+    const description = document.getElementById("description").value;
+    const price = document.getElementById("price").value;
 
-    // ✅ ADD BOOK
-    async function addBook() {
-      const title = document.getElementById("title").value;
-      const author = document.getElementById("author").value;
-      const description = document.getElementById("description").value;
-      const price = document.getElementById("price").value;
+    const { error } = await supabase
+      .from("books")
+      .insert([{ title, author, description, price }]);
 
-      if (!title || !author) {
-        alert("Title and author required");
-        return;
-      }
-
-      const { error } = await supabase
-        .from("books")
-        .insert([{ title, author, description, price }]);
-
-      if (error) {
-        alert(error.message);
-        return;
-      }
-
-      document.getElementById("title").value = "";
-      document.getElementById("author").value = "";
-      document.getElementById("description").value = "";
-      document.getElementById("price").value = "";
-
+    if (error) {
+      alert(error.message);
+    } else {
       loadBooks();
     }
+  }
 
-    // ✅ LOAD BOOKS
-    async function loadBooks() {
-      const { data, error } = await supabase
-        .from("books")
-        .select("*")
-        .order("id", { ascending: false });
+  // 📚 LOAD BOOKS
+  async function loadBooks() {
+    const { data } = await supabase.from("books").select("*");
 
-      if (error) {
-        alert(error.message);
-        return;
-      }
+    const box = document.getElementById("books");
+    box.innerHTML = "";
 
-      const container = document.getElementById("books");
-      container.innerHTML = "";
-
-      data.forEach(book => {
-        const div = document.createElement("div");
-        div.innerHTML = `<strong>${book.title}</strong><br>
-        ${book.author}<br>
-        $${book.price || 0}`;
-        container.appendChild(div);
-      });
-    }
-
-    // 🔄 AUTO CHECK SESSION
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        document.getElementById("loginBox").classList.add("hidden");
-        document.getElementById("adminBox").classList.remove("hidden");
-        loadBooks();
-      }
+    data.forEach(b => {
+      box.innerHTML += <p><b>${b.title}</b> – ${b.author}</p>;
     });
-  </script>
+  }
+
+  // 🚪 LOGOUT
+  async function logout() {
+    await supabase.auth.signOut();
+    location.reload();
+  }
+</script>
 
 </body>
 </html>
