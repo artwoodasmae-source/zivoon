@@ -1,79 +1,164 @@
-[15:29, 27/12/2025] 😊🩷: https://zivoon.com/admin.html
-[15:31, 27/12/2025] 😊🩷: <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Admin – Zivoon Books</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Supabase -->
+  <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    body{font-family:Arial,sans-serif;background:#f5f6f8;padding:30px}
-    .box{max-width:420px;margin:auto;background:#fff;padding:25px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.1)}
-    h2{margin-top:0}
-    input,button{width:100%;padding:12px;margin-top:10px}
-    button{background:#2563eb;color:#fff;border:none;border-radius:6px;cursor:pointer}
-    .hidden{display:none}
-    .error{color:red;margin-top:10px}
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 0;
+    }
+    .box {
+      max-width: 420px;
+      margin: 80px auto;
+      background: #fff;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    button.logout {
+      background: #ef4444;
+      margin-top: 10px;
+    }
+    .hidden {
+      display: none;
+    }
+    .book {
+      background: #f1f5f9;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
   </style>
 </head>
 
 <body>
-<div id="loginBox" class="box">
+
+<!-- LOGIN -->
+<div class="box" id="loginBox">
   <h2>Admin Login</h2>
-  <input id="email" type="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button id="btnLogin">Sign in</button>
-  <div id="error" class="error"></div>
+  <input type="email" id="email" placeholder="Email" />
+  <input type="password" id="password" placeholder="Password" />
+  <button onclick="login()">Sign in</button>
 </div>
 
-<div id="dashboard" class="box hidden">
-  <h2>Welcome Admin 👋</h2>
-  <p>You are successfully logged in.</p>
-  <button id="btnLogout">Logout</button>
+<!-- ADMIN PANEL -->
+<div class="box hidden" id="adminBox">
+  <h2>Books Admin</h2>
+
+  <input id="title" placeholder="Book title" />
+  <input id="author" placeholder="Author" />
+  <textarea id="description" placeholder="Description"></textarea>
+  <input id="price" type="number" step="0.01" placeholder="Price" />
+  <button onclick="addBook()">Add book</button>
+
+  <hr />
+
+  <div id="books"></div>
+
+  <button class="logout" onclick="logout()">Logout</button>
 </div>
 
 <script>
-  // ✅ بدّلي هاد جوج
-  const SUPABASE_URL = "https://kmheqgtavgmljyzvbrsj.supabase.co";
-  const SUPABASE_ANON_KEY = "PUT_YOUR_PUBLISHABLE_KEY_HERE";
+  // 🔴 بدّلي هاد جوج فقط
+  const SUPABASE_URL = "https://kmheqgtavgmljyzvbrsj.supabase.com";
+  const SUPABASE_KEY = "sb_publishable_RFjLkP-h82e0RGP2GUAcdg_WOI77v68";
 
-  // ✅ مهم: نخلي الاسم supabaseClient باش مايتصادمش مع المكتبة
-  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const supabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
   async function login() {
-    document.getElementById("error").innerText = "";
-    const email = document.getElementById("email").value.trim();
+    const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
-    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
     if (error) {
-      document.getElementById("error").innerText = error.message;
-      return;
+      alert(error.message);
+    } else {
+      loadAdmin();
     }
-    location.reload();
   }
 
   async function logout() {
-    await supabaseClient.auth.signOut();
+    await supabase.auth.signOut();
     location.reload();
   }
 
-  async function checkSession() {
-    const { data } = await supabaseClient.auth.getSession();
-    if (data && data.session) {
-      document.getElementById("loginBox").classList.add("hidden");
-      document.getElementById("dashboard").classList.remove("hidden");
+  async function loadAdmin() {
+    document.getElementById("loginBox").classList.add("hidden");
+    document.getElementById("adminBox").classList.remove("hidden");
+    loadBooks();
+  }
+
+  async function addBook() {
+    const book = {
+      title: title.value,
+      author: author.value,
+      description: description.value,
+      price: price.value,
+    };
+
+    const { error } = await supabase.from("books").insert(book);
+    if (error) {
+      alert(error.message);
+    } else {
+      title.value = "";
+      author.value = "";
+      description.value = "";
+      price.value = "";
+      loadBooks();
     }
   }
 
-  document.getElementById("btnLogin").addEventListener("click", login);
-  document.getElementById("btnLogout").addEventListener("click", logout);
+  async function loadBooks() {
+    const { data } = await supabase.from("books").select("*").order("id", { ascending: false });
+    const box = document.getElementById("books");
+    box.innerHTML = "";
+    data.forEach(b => {
+      box.innerHTML += `<div class="book">
+        <b>${b.title}</b><br/>
+        ${b.author} – $${b.price}
+      </div>`;
+    });
+  }
 
-  checkSession();
+  // Auto check session
+  supabase.auth.getSession().then(({ data }) => {
+    if (data.session) loadAdmin();
+  });
 </script>
+
 </body>
 </html>
