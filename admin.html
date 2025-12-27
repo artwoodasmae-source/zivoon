@@ -2,229 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin - Zivoon</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin - Zivoon</title>
 
-  <!-- Supabase v2 UMD -->
+  <!-- Supabase CDN (كيعطيك window.supabase) -->
   <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
+  <!-- ملف الجافاسكريبت ديالك -->
+  <script src="./admin.js" defer></script>
+
   <style>
-    body{font-family:Arial,sans-serif;background:#f2f4f7;margin:0;padding:0}
-    .box{max-width:520px;margin:70px auto;background:#fff;padding:24px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-    h2{text-align:center;margin:0 0 16px 0}
-    input,textarea,button{width:100%;padding:10px;margin-bottom:12px;box-sizing:border-box;border-radius:8px;border:1px solid #d8dee6}
-    textarea{min-height:90px;resize:vertical}
-    button{background:#2563eb;color:#fff;border:none;cursor:pointer;font-weight:600}
-    button:disabled{opacity:.6;cursor:not-allowed}
+    body{font-family:Arial,sans-serif;background:#f2f4f7}
+    .box{max-width:420px;margin:80px auto;background:#fff;padding:24px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+    h2{text-align:center}
+    input,textarea,button{width:100%;padding:10px;margin-bottom:12px;box-sizing:border-box}
+    button{background:#2563eb;color:#fff;border:0;cursor:pointer;border-radius:8px}
     .hidden{display:none}
-    .small{font-size:12px;color:#6b7280;margin-top:-6px;margin-bottom:12px}
-    .danger{background:#ef4444}
-    .row{display:flex;gap:10px}
-    .row > *{flex:1}
-    .topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
-    .pill{font-size:12px;background:#eef2ff;color:#3730a3;padding:6px 10px;border-radius:999px}
   </style>
 </head>
 
 <body>
-  <!-- LOGIN -->
   <div class="box" id="loginBox">
     <h2>Admin Login</h2>
-    <input type="email" id="email" placeholder="Email" autocomplete="username" />
-    <input type="password" id="password" placeholder="Password" autocomplete="current-password" />
-    <button id="btnLogin">Sign in</button>
-    <div class="small" id="loginHint"></div>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <!-- مهم: type=button باش مايديرش refresh -->
+    <button id="btnLogin" type="button">Sign in</button>
   </div>
 
-  <!-- ADMIN -->
   <div class="box hidden" id="adminBox">
-    <div class="topbar">
-      <div class="pill" id="whoami">Signed in</div>
-      <button id="btnLogout" class="danger" style="max-width:160px;margin:0;">Logout</button>
-    </div>
-
     <h2>Books Admin</h2>
-
     <input id="title" placeholder="Book title" />
-    <div class="row">
-      <input id="author" placeholder="Author" />
-      <input id="price" type="number" step="0.01" placeholder="Price" />
-    </div>
+    <input id="author" placeholder="Author" />
     <textarea id="description" placeholder="Description"></textarea>
+    <input id="price" type="number" step="0.01" placeholder="Price" />
 
-    <button id="btnAdd">Add Book</button>
-    <div class="small" id="adminHint"></div>
+    <button id="btnAdd" type="button">Add Book</button>
+    <button id="btnLogout" type="button">Logout</button>
   </div>
-
-  <script>
-    /*****  CONFIG (بدلي هاد جوج فقط)  *****/
-    const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE"; 
-    // مثال صحيح: "https://xxxxxx.supabase.co"
-
-    const SUPABASE_ANON_KEY = "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
-    // خاصها تبدا بـ sb_publishable_ ... (ماشي sb_secret_)
-
-    /*****  OPTIONAL: email ديال الادمن  *****/
-    const ALLOWED_ADMIN_EMAILS = [
-      "artwood.asmae@gmail.com"  // بدليها ولا زيدي ايمايلات اخرى اذا بغيتي
-    ];
-
-    /*****  INIT  *****/
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    /*****  HELPERS  *****/
-    const $ = (id) => document.getElementById(id);
-
-    function showLogin(msg = "") {
-      $("adminBox").classList.add("hidden");
-      $("loginBox").classList.remove("hidden");
-      $("loginHint").textContent = msg || "";
-    }
-
-    function showAdmin(email) {
-      $("loginBox").classList.add("hidden");
-      $("adminBox").classList.remove("hidden");
-      $("whoami").textContent = Signed in: ${email};
-      $("adminHint").textContent = "";
-    }
-
-    function isAllowedEmail(email) {
-      return ALLOWED_ADMIN_EMAILS.map(e => e.toLowerCase()).includes((email || "").toLowerCase());
-    }
-
-    function setBusy(btn, busy, textWhenBusy="Please wait...") {
-      if (!btn) return;
-      btn.disabled = !!busy;
-      btn.dataset.oldText = btn.dataset.oldText || btn.textContent;
-      btn.textContent = busy ? textWhenBusy : btn.dataset.oldText;
-    }
-
-    /*****  SESSION CHECK ON LOAD  *****/
-    async function boot() {
-      // إذا ما بدلتيش الURL/KEY غادي يبان الخطأ مباشرة باش تعرفي فين المشكل
-      if (SUPABASE_URL.includes("PASTE_") || SUPABASE_ANON_KEY.includes("PASTE_")) {
-        showLogin("⚠️ حطي SUPABASE_URL و SUPABASE_ANON_KEY ديالك فـ الكود.");
-        return;
-      }
-
-      const { data, error } = await sb.auth.getUser();
-      if (error || !data?.user) {
-        showLogin("");
-        return;
-      }
-
-      const email = data.user.email || "";
-      if (!isAllowedEmail(email)) {
-        await sb.auth.signOut();
-        showLogin("❌ هذا الإيميل ماشي Admin.");
-        return;
-      }
-
-      showAdmin(email);
-    }
-
-    /*****  AUTH  *****/
-    async function login() {
-      const btn = $("btnLogin");
-      setBusy(btn, true, "Signing in...");
-
-      try {
-        const email = $("email").value.trim();
-        const password = $("password").value;
-
-        if (!email || !password) {
-          alert("دخل email و password");
-          return;
-        }
-
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
-
-        if (error) {
-          // غالباً غادي يعطيك Invalid API key إلا كان key غلط
-          alert(error.message);
-          return;
-        }
-
-        const userEmail = data?.user?.email || email;
-
-        if (!isAllowedEmail(userEmail)) {
-          await sb.auth.signOut();
-          alert("هاد الحساب ماشي Admin.");
-          return;
-        }
-
-        showAdmin(userEmail);
-
-      } finally {
-        setBusy(btn, false);
-      }
-    }
-
-    async function logout() {
-      const btn = $("btnLogout");
-      setBusy(btn, true, "Logging out...");
-      try {
-        await sb.auth.signOut();
-        showLogin("");
-      } finally {
-        setBusy(btn, false);
-      }
-    }
-
-    /*****  CRUD: ADD BOOK  *****/
-    async function addBook() {
-      const btn = $("btnAdd");
-      setBusy(btn, true, "Adding...");
-
-      try {
-        const title = $("title").value.trim();
-        const author = $("author").value.trim();
-        const description = $("description").value.trim();
-        const priceRaw = $("price").value;
-        const price = priceRaw === "" ? null : Number(priceRaw);
-
-        if (!title) { alert("دخل عنوان الكتاب"); return; }
-
-        // تأكد session موجودة
-        const { data: userData, error: userErr } = await sb.auth.getUser();
-        if (userErr || !userData?.user) {
-          showLogin("خصك تعاود تسجيل الدخول.");
-          return;
-        }
-
-        // Insert
-        const { error } = await sb
-          .from("books")
-          .insert([{ title, author, description, price }]);
-
-        if (error) {
-          alert(error.message);
-          return;
-        }
-
-        alert("✅ Book added");
-        $("title").value = "";
-        $("author").value = "";
-        $("description").value = "";
-        $("price").value = "";
-
-      } finally {
-        setBusy(btn, false);
-      }
-    }
-
-    /*****  BUTTONS  *****/
-    $("btnLogin").addEventListener("click", login);
-    $("btnLogout").addEventListener("click", logout);
-    $("btnAdd").addEventListener("click", addBook);
-
-    // Enter key for login
-    $("password").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") login();
-    });
-
-    // Run
-    boot();
-  </script>
 </body>
 </html>
