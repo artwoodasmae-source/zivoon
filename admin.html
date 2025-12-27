@@ -1,504 +1,102 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
+  <title>Admin – Zivoon Books</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin - Zivoon Books</title>
 
-  <style>
-    :root{
-      --bg1:#0b2a4a; --bg2:#0a1e36;
-      --card:#ffffff; --muted:#6b7280;
-      --border:#e5e7eb; --ok:#16a34a; --err:#ef4444;
-      --btn:#2563eb; --btn2:#0ea5e9; --danger:#dc2626;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background:linear-gradient(140deg,var(--bg1),var(--bg2));
-      color:#111;
-      min-height:100vh;
-    }
-    header{
-      padding:22px 18px;
-      color:#fff;
-      font-weight:700;
-      letter-spacing:.3px;
-      font-size:24px;
-    }
-    .wrap{max-width:1100px; margin:0 auto; padding:0 18px 40px;}
-    .card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:16px;
-      box-shadow:0 16px 40px rgba(0,0,0,.18);
-      padding:18px;
-    }
-    .row{display:flex; gap:14px; flex-wrap:wrap;}
-    .row > *{flex:1; min-width:220px;}
-    label{display:block; font-size:13px; color:#374151; margin:10px 0 6px;}
-    input, textarea, select{
-      width:100%;
-      padding:10px 12px;
-      border:1px solid var(--border);
-      border-radius:10px;
-      outline:none;
-      font-size:14px;
-      background:#fff;
-    }
-    textarea{min-height:88px; resize:vertical;}
-    .actions{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
-    button{
-      border:0;
-      cursor:pointer;
-      padding:10px 14px;
-      border-radius:10px;
-      font-weight:600;
-      font-size:14px;
-    }
-    .btn{background:var(--btn); color:#fff;}
-    .btn2{background:var(--btn2); color:#fff;}
-    .danger{background:var(--danger); color:#fff;}
-    .ghost{background:#f3f4f6; color:#111; border:1px solid var(--border);}
-    .pill{
-      display:inline-flex; gap:8px; align-items:center;
-      padding:6px 10px;
-      border-radius:999px;
-      background:#f3f4f6;
-      border:1px solid var(--border);
-      font-size:13px;
-      color:#111;
-    }
-    .muted{color:var(--muted); font-size:13px;}
-    .status{font-size:13px; margin-top:8px;}
-    .ok{color:var(--ok);} .err{color:var(--err);}
-
-    table{width:100%; border-collapse:collapse; margin-top:14px;}
-    th, td{
-      border-bottom:1px solid var(--border);
-      padding:10px 8px;
-      text-align:left;
-      vertical-align:top;
-      font-size:14px;
-    }
-    th{font-size:12px; text-transform:uppercase; color:#374151; letter-spacing:.06em;}
-    .small{font-size:12px; color:#6b7280;}
-    .topbar{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;}
-    .hidden{display:none !important;}
-    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
-    @media(max-width:900px){ .grid2{grid-template-columns:1fr;} }
-    .divider{height:1px; background:var(--border); margin:14px 0;}
-  </style>
-
-  <!-- Supabase JS (CDN) -->
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script>
-    // ✅ 1) بدّلي هاد جوج:
-    const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE";
-    const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_PUBLIC_KEY_HERE";
-
-    // create client
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // Table name
-    const TABLE = "books";
-
-    // OPTIONAL: زيدي إيميلك هنا باش نخليو الدخول غير ليه (حماية إضافية من الواجهة)
-    const ADMIN_EMAIL_ALLOWLIST = [
-      "artwood.asmae@gmail.com"
-    ];
-  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f6f8;
+      padding: 30px;
+    }
+    .box {
+      max-width: 420px;
+      margin: auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.1);
+    }
+    h2 { margin-top: 0; }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+    }
+    button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .hidden { display: none; }
+    .error { color: red; margin-top: 10px; }
+  </style>
 </head>
 
 <body>
-  <header>Admin Panel</header>
 
-  <div class="wrap">
-    <div class="card">
-      <div class="topbar">
-        <div>
-          <div style="font-weight:800; font-size:18px;">Zivoon Books — Dashboard</div>
-          <div class="muted">Login, add, edit, delete books from Supabase.</div>
-        </div>
+<div id="loginBox" class="box">
+  <h2>Admin Login</h2>
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Sign in</button>
+  <div id="error" class="error"></div>
+</div>
 
-        <div class="actions">
-          <span id="who" class="pill hidden"></span>
-          <button id="btnLogout" class="ghost hidden">Logout</button>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <!-- LOGIN -->
-      <div id="loginBox">
-        <div class="row">
-          <div>
-            <label>Email</label>
-            <input id="email" type="email" placeholder="you@email.com" autocomplete="email" />
-          </div>
-          <div>
-            <label>Password</label>
-            <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
-          </div>
-          <div style="display:flex; align-items:flex-end; gap:10px;">
-            <button id="btnLogin" class="btn">Sign in</button>
-            <button id="btnSignup" class="ghost" title="Create account (only once)">Sign up</button>
-          </div>
-        </div>
-        <div id="loginStatus" class="status muted"></div>
-
-        <div class="muted" style="margin-top:10px;">
-          Tip: إلا بغيتي غير إنتي تكوني Admin، دخّلي الإيميل ديالك فـ <b>ADMIN_EMAIL_ALLOWLIST</b> فالـ code.
-        </div>
-      </div>
-
-      <!-- DASHBOARD -->
-      <div id="dash" class="hidden">
-        <div class="grid2">
-          <div>
-            <div style="font-weight:800; margin-bottom:6px;">Add / Update book</div>
-            <div class="muted">إلى بغيتي تعدلي كتاب، كليكي عليه من اللائحة لتحت.</div>
-
-            <input id="editId" type="hidden" />
-
-            <label>Title</label>
-            <input id="title" type="text" placeholder="Book title" />
-
-            <label>Author</label>
-            <input id="author" type="text" placeholder="Author name" />
-
-            <label>Description</label>
-            <textarea id="description" placeholder="Short description..."></textarea>
-
-            <div class="row">
-              <div>
-                <label>Price</label>
-                <input id="price" type="number" step="0.01" placeholder="9.99" />
-              </div>
-              <div>
-                <label>Rating</label>
-                <input id="rating" type="number" step="0.1" placeholder="5" />
-              </div>
-              <div>
-                <label>Language</label>
-                <input id="language" type="text" placeholder="en, ar, fr..." />
-              </div>
-            </div>
-
-            <div class="actions" style="margin-top:12px;">
-              <button id="btnSave" class="btn2">Save (Insert/Update)</button>
-              <button id="btnClear" class="ghost">Clear</button>
-              <button id="btnDelete" class="danger hidden">Delete selected</button>
-            </div>
-
-            <div id="formStatus" class="status muted"></div>
-          </div>
-
-          <div>
-            <div class="topbar">
-              <div>
-                <div style="font-weight:800; margin-bottom:6px;">Books list</div>
-                <div class="muted">Search, refresh, and manage your books.</div>
-              </div>
-              <div class="actions">
-                <input id="search" type="text" placeholder="Search title/author..." style="max-width:260px;" />
-                <button id="btnRefresh" class="ghost">Refresh</button>
-              </div>
-            </div>
-
-            <table>
-              <thead>
-                <tr>
-                  <th style="width:70px;">ID</th>
-                  <th>Title</th>
-                  <th>Author</th>
-                  <th style="width:90px;">Price</th>
-                  <th style="width:80px;">Rating</th>
-                  <th style="width:90px;">Lang</th>
-                  <th style="width:160px;">Created</th>
-                </tr>
-              </thead>
-              <tbody id="tbody">
-                <tr><td colspan="7" class="muted">Loading...</td></tr>
-              </tbody>
-            </table>
-
-            <div id="listStatus" class="status muted"></div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
+<div id="dashboard" class="box hidden">
+  <h2>Welcome Admin 👋</h2>
+  <p>You are successfully logged in.</p>
+  <button onclick="logout()">Logout</button>
+</div>
 
 <script>
-  // Helpers
-  const $ = (id) => document.getElementById(id);
-  const setText = (id, txt, cls="muted") => { const el=$(id); el.className = "status " + cls; el.textContent = txt || ""; };
+  // 🔴 بدلي هاد القيم فقط
+  const SUPABASE_URL = "https://kmheqgtavgmljyzvbrsj.supabase.co";
+  const SUPABASE_ANON_KEY = "PUT_YOUR_PUBLISHABLE_KEY_HERE";
 
-  function safeNumber(v){
-    if(v === "" || v === null || v === undefined) return null;
-    const n = Number(v);
-    return Number.isFinite(n) ? n : null;
-  }
+  const supabase = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
 
-  function formatDate(ts){
-    if(!ts) return "";
-    try{
-      const d = new Date(ts);
-      return d.toLocaleString();
-    }catch(e){ return String(ts); }
-  }
+  async function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-  // UI state
-  function showLoggedOut(){
-    $("loginBox").classList.remove("hidden");
-    $("dash").classList.add("hidden");
-    $("who").classList.add("hidden");
-    $("btnLogout").classList.add("hidden");
-    setText("loginStatus", "", "muted");
-  }
-  function showLoggedIn(email){
-    $("loginBox").classList.add("hidden");
-    $("dash").classList.remove("hidden");
-    $("who").classList.remove("hidden");
-    $("btnLogout").classList.remove("hidden");
-    $("who").textContent = "Logged in: " + email;
-  }
-
-  function clearForm(){
-    $("editId").value = "";
-    $("title").value = "";
-    $("author").value = "";
-    $("description").value = "";
-    $("price").value = "";
-    $("rating").value = "";
-    $("language").value = "";
-    $("btnDelete").classList.add("hidden");
-    setText("formStatus", "", "muted");
-  }
-
-  function fillForm(row){
-    $("editId").value = row.id ?? "";
-    $("title").value = row.title ?? "";
-    $("author").value = row.author ?? "";
-    $("description").value = row.description ?? "";
-    $("price").value = row.price ?? "";
-    $("rating").value = row.rating ?? "";
-    $("language").value = row.language ?? "";
-    $("btnDelete").classList.remove("hidden");
-    setText("formStatus", "Selected ID: " + row.id, "ok");
-  }
-
-  async function refreshList(){
-    setText("listStatus", "Loading books...", "muted");
-    const q = ($("search").value || "").trim().toLowerCase();
-
-    const { data, error } = await sb
-      .from(TABLE)
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if(error){
-      $("tbody").innerHTML = <tr><td colspan="7" class="err">Error: ${error.message}</td></tr>;
-      setText("listStatus", "Failed to load.", "err");
-      return;
-    }
-
-    const filtered = (data || []).filter(r => {
-      if(!q) return true;
-      const t = String(r.title || "").toLowerCase();
-      const a = String(r.author || "").toLowerCase();
-      return t.includes(q) || a.includes(q);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password
     });
 
-    if(filtered.length === 0){
-      $("tbody").innerHTML = <tr><td colspan="7" class="muted">No books found.</td></tr>;
-      setText("listStatus", "0 results.", "muted");
-      return;
-    }
-
-    $("tbody").innerHTML = filtered.map(r => `
-      <tr data-id="${r.id}">
-        <td><b>#${r.id}</b></td>
-        <td>
-          <div style="font-weight:700">${escapeHtml(r.title || "")}</div>
-          <div class="small">${escapeHtml((r.description || "").slice(0,70))}${(r.description||"").length>70?"…":""}</div>
-        </td>
-        <td>${escapeHtml(r.author || "")}</td>
-        <td>${r.price ?? ""}</td>
-        <td>${r.rating ?? ""}</td>
-        <td>${escapeHtml(r.language || "")}</td>
-        <td class="small">${escapeHtml(formatDate(r.created_at))}</td>
-      </tr>
-    `).join("");
-
-    // click to edit
-    [...$("tbody").querySelectorAll("tr")].forEach(tr => {
-      tr.addEventListener("click", () => {
-        const id = Number(tr.getAttribute("data-id"));
-        const row = filtered.find(x => x.id === id);
-        if(row) fillForm(row);
-      });
-    });
-
-    setText("listStatus", ${filtered.length} book(s) loaded., "ok");
-  }
-
-  // Basic HTML escape to avoid broken table
-  function escapeHtml(str){
-    return String(str)
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-
-  // Auth check + allowlist
-  async function bootstrap(){
-    try{
-      const { data } = await sb.auth.getSession();
-      const session = data?.session;
-
-      if(!session){
-        showLoggedOut();
-        return;
-      }
-
-      const email = session.user?.email || "";
-      // extra UI-only protection
-      if(ADMIN_EMAIL_ALLOWLIST.length && !ADMIN_EMAIL_ALLOWLIST.includes(email)){
-        await sb.auth.signOut();
-        showLoggedOut();
-        setText("loginStatus", "This email is not allowed for admin.", "err");
-        return;
-      }
-
-      showLoggedIn(email);
-      await refreshList();
-    }catch(e){
-      showLoggedOut();
-      setText("loginStatus", "Setup error: " + e.message, "err");
-    }
-  }
-
-  // Events
-  $("btnLogin").addEventListener("click", async () => {
-    setText("loginStatus", "Signing in...", "muted");
-    const email = $("email").value.trim();
-    const password = $("password").value;
-
-    const { data, error } = await sb.auth.signInWithPassword({ email, password });
-    if(error){
-      setText("loginStatus", error.message, "err");
-      return;
-    }
-
-    const u = data?.user?.email || email;
-    if(ADMIN_EMAIL_ALLOWLIST.length && !ADMIN_EMAIL_ALLOWLIST.includes(u)){
-      await sb.auth.signOut();
-      setText("loginStatus", "This email is not allowed for admin.", "err");
-      return;
-    }
-
-    showLoggedIn(u);
-    clearForm();
-    await refreshList();
-  });
-
-  $("btnSignup").addEventListener("click", async () => {
-    setText("loginStatus", "Creating account...", "muted");
-    const email = $("email").value.trim();
-    const password = $("password").value;
-
-    const { data, error } = await sb.auth.signUp({ email, password });
-    if(error){
-      setText("loginStatus", error.message, "err");
-      return;
-    }
-
-    // depending on email confirmations, user may need confirm
-    setText("loginStatus", "Account created. If email confirmation is ON, check your inbox then login.", "ok");
-  });
-
-  $("btnLogout").addEventListener("click", async () => {
-    await sb.auth.signOut();
-    showLoggedOut();
-    clearForm();
-  });
-
-  $("btnClear").addEventListener("click", () => clearForm());
-  $("btnRefresh").addEventListener("click", () => refreshList());
-  $("search").addEventListener("input", () => refreshList());
-
-  $("btnSave").addEventListener("click", async () => {
-    setText("formStatus", "Saving...", "muted");
-
-    const id = $("editId").value ? Number($("editId").value) : null;
-
-    const payload = {
-      title: $("title").value.trim() || null,
-      author: $("author").value.trim() || null,
-      description: $("description").value.trim() || null,
-      price: safeNumber($("price").value),
-      rating: safeNumber($("rating").value),
-      language: $("language").value.trim() || null
-    };
-
-    // simple validation
-    if(!payload.title){
-      setText("formStatus", "Title is required.", "err");
-      return;
-    }
-
-    let res;
-    if(id){
-      res = await sb.from(TABLE).update(payload).eq("id", id).select().single();
+    if (error) {
+      document.getElementById("error").innerText = error.message;
     } else {
-      res = await sb.from(TABLE).insert(payload).select().single();
+      location.reload();
     }
+  }
 
-    if(res.error){
-      setText("formStatus", res.error.message, "err");
-      return;
+  async function logout() {
+    await supabase.auth.signOut();
+    location.reload();
+  }
+
+  async function checkSession() {
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      document.getElementById("loginBox").classList.add("hidden");
+      document.getElementById("dashboard").classList.remove("hidden");
     }
+  }
 
-    setText("formStatus", id ? "Updated ✅" : "Inserted ✅", "ok");
-    clearForm();
-    await refreshList();
-  });
-
-  $("btnDelete").addEventListener("click", async () => {
-    const id = $("editId").value ? Number($("editId").value) : null;
-    if(!id) return;
-
-    if(!confirm("Delete this book? ID: " + id)){
-      return;
-    }
-
-    setText("formStatus", "Deleting...", "muted");
-    const { error } = await sb.from(TABLE).delete().eq("id", id);
-    if(error){
-      setText("formStatus", error.message, "err");
-      return;
-    }
-
-    setText("formStatus", "Deleted ✅", "ok");
-    clearForm();
-    await refreshList();
-  });
-
-  // React to auth changes (optional)
-  sb.auth.onAuthStateChange((_event, _session) => {
-    // just refresh UI quickly
-    bootstrap();
-  });
-
-  // start
-  bootstrap();
+  checkSession();
 </script>
+
 </body>
 </html>
