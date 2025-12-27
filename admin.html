@@ -2,43 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>Admin – Zivoon</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin - Zivoon</title>
 
-  <!-- Supabase CDN (كيعطيك window.supabase) -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
-  <!-- ملف الجافاسكريبت ديالك -->
-  <script src="./admin.js" defer></script>
+  <!-- Supabase CDN -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <style>
-    body{font-family:Arial,sans-serif;background:#f2f4f7}
-    .box{max-width:420px;margin:80px auto;background:#fff;padding:24px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-    h2{text-align:center}
-    input,textarea,button{width:100%;padding:10px;margin-bottom:12px;box-sizing:border-box}
-    button{background:#2563eb;color:#fff;border:0;cursor:pointer;border-radius:8px}
-    .hidden{display:none}
+    body { font-family: Arial; background:#f2f4f7 }
+    .box { max-width:420px; margin:80px auto; background:#fff; padding:24px; border-radius:8px }
+    h2 { text-align:center }
+    input, textarea, button { width:100%; padding:10px; margin-bottom:12px }
+    button { background:#2563eb; color:#fff; border:none; cursor:pointer }
+    .hidden { display:none }
   </style>
 </head>
 
 <body>
-  <div class="box" id="loginBox">
-    <h2>Admin Login</h2>
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
-    <!-- مهم: type=button باش مايديرش refresh -->
-    <button id="btnLogin" type="button">Sign in</button>
-  </div>
 
-  <div class="box hidden" id="adminBox">
-    <h2>Books Admin</h2>
-    <input id="title" placeholder="Book title" />
-    <input id="author" placeholder="Author" />
-    <textarea id="description" placeholder="Description"></textarea>
-    <input id="price" type="number" step="0.01" placeholder="Price" />
+<!-- LOGIN -->
+<div class="box" id="loginBox">
+  <h2>Admin Login</h2>
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button id="btnLogin">Sign in</button>
+</div>
 
-    <button id="btnAdd" type="button">Add Book</button>
-    <button id="btnLogout" type="button">Logout</button>
-  </div>
+<!-- ADMIN -->
+<div class="box hidden" id="adminBox">
+  <h2>Books Admin</h2>
+  <input id="title" placeholder="Book title">
+  <input id="author" placeholder="Author">
+  <textarea id="description" placeholder="Description"></textarea>
+  <input id="price" type="number" step="0.01" placeholder="Price">
+  <button id="btnAdd">Add Book</button>
+  <button id="btnLogout">Logout</button>
+</div>
+
+<script src="admin.js"></script>
 </body>
 </html>
